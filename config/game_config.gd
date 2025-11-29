@@ -8,6 +8,7 @@ extends Node
 
 const GRID_SIZE: int = 7
 const CAPITAL_POSITION: Vector2i = Vector2i(1, 1)
+const AI_CAPITAL_POSITION: Vector2i = Vector2i(5, 5)
 
 # =============================================================================
 # DEFENSE SETTINGS (by ring/distance from capital)
@@ -105,7 +106,7 @@ const RATING_GOOD_TURNS: int = 30     # 1 star
 # ENUMS (used by game_state and game_logic)
 # =============================================================================
 
-enum TileOwner { NEUTRAL, PLAYER }
+enum TileOwner { NEUTRAL, PLAYER, AI }
 enum ResourceType { MANPOWER, GOODS, SUPPLIES, ALL }
 enum UnitType { PIKEMAN, CAVALRY, ARCHER }
 

@@ -42,6 +42,23 @@ var army: Dictionary = {
 # Current turn assignments: tile_coord -> {pikemen, cavalry, archers}
 var assignments: Dictionary = {}
 
+# AI resources
+var ai_resources: Dictionary = {
+	"manpower": 0,
+	"goods": 0,
+	"supplies": 0
+}
+
+# AI army pool
+var ai_army: Dictionary = {
+	"pikemen": 0,
+	"cavalry": 0,
+	"archers": 0
+}
+
+# AI tiles count
+var ai_tiles_owned: int = 1
+
 # Game progress
 var turn_number: int = 1
 var tiles_owned: int = 1
@@ -61,6 +78,7 @@ func reset_to_initial_state() -> void:
 	assignments.clear()
 	turn_number = 1
 	tiles_owned = 1
+	ai_tiles_owned = 1
 	game_over = false
 	selected_tile = Vector2i(-1, -1)
 
@@ -77,13 +95,22 @@ func _generate_map() -> void:
 func _create_tile(x: int, y: int) -> MapTile:
 	var pos := Vector2i(x, y)
 
-	# Capital tile
+	# Player capital tile
 	if pos == Config.CAPITAL_POSITION:
 		return MapTile.new(
 			Config.TileOwner.PLAYER,
 			Config.ResourceType.ALL,
 			0,  # Special handling for capital production
 			0   # No defense for player tiles
+		)
+
+	# AI capital tile
+	if pos == Config.AI_CAPITAL_POSITION:
+		return MapTile.new(
+			Config.TileOwner.AI,
+			Config.ResourceType.ALL,
+			0,  # Special handling for capital production
+			0   # No defense for AI tiles (AI defends with army)
 		)
 
 	# Neutral tile
@@ -115,11 +142,19 @@ func _set_starting_resources() -> void:
 	resources["manpower"] = Config.START_MANPOWER
 	resources["goods"] = Config.START_GOODS
 	resources["supplies"] = Config.START_SUPPLIES
+	# AI starts with same resources
+	ai_resources["manpower"] = Config.START_MANPOWER
+	ai_resources["goods"] = Config.START_GOODS
+	ai_resources["supplies"] = Config.START_SUPPLIES
 
 func _set_starting_army() -> void:
 	army["pikemen"] = Config.START_PIKEMEN
 	army["cavalry"] = Config.START_CAVALRY
 	army["archers"] = Config.START_ARCHERS
+	# AI starts with same army
+	ai_army["pikemen"] = Config.START_PIKEMEN
+	ai_army["cavalry"] = Config.START_CAVALRY
+	ai_army["archers"] = Config.START_ARCHERS
 
 # =============================================================================
 # TILE ACCESS
@@ -133,9 +168,17 @@ func get_tile(x: int, y: int) -> MapTile:
 func set_tile_owner(x: int, y: int, new_owner: int) -> void:
 	var tile := get_tile(x, y)
 	if tile:
+		var old_owner: int = tile.owner
 		tile.owner = new_owner
+		# Update tile counts
+		if old_owner == Config.TileOwner.PLAYER:
+			tiles_owned -= 1
+		elif old_owner == Config.TileOwner.AI:
+			ai_tiles_owned -= 1
 		if new_owner == Config.TileOwner.PLAYER:
 			tiles_owned += 1
+		elif new_owner == Config.TileOwner.AI:
+			ai_tiles_owned += 1
 
 func is_valid_coord(x: int, y: int) -> bool:
 	return x >= 0 and x < Config.GRID_SIZE and y >= 0 and y < Config.GRID_SIZE
@@ -226,14 +269,29 @@ func get_adjacent_coords(x: int, y: int) -> Array[Vector2i]:
 	return adjacent
 
 func is_border_tile(x: int, y: int) -> bool:
+	# A tile is a player border if it's neutral/AI and adjacent to player
 	var tile := get_tile(x, y)
-	if not tile or tile.owner != Config.TileOwner.NEUTRAL:
+	if not tile or tile.owner == Config.TileOwner.PLAYER:
 		return false
 
 	# Check if any adjacent tile is owned by player
 	for adj in get_adjacent_coords(x, y):
 		var adj_tile := get_tile(adj.x, adj.y)
 		if adj_tile and adj_tile.owner == Config.TileOwner.PLAYER:
+			return true
+
+	return false
+
+func is_ai_border_tile(x: int, y: int) -> bool:
+	# A tile is an AI border if it's neutral/player and adjacent to AI
+	var tile := get_tile(x, y)
+	if not tile or tile.owner == Config.TileOwner.AI:
+		return false
+
+	# Check if any adjacent tile is owned by AI
+	for adj in get_adjacent_coords(x, y):
+		var adj_tile := get_tile(adj.x, adj.y)
+		if adj_tile and adj_tile.owner == Config.TileOwner.AI:
 			return true
 
 	return false
@@ -246,12 +304,25 @@ func get_all_borders() -> Array[Vector2i]:
 				borders.append(Vector2i(x, y))
 	return borders
 
+func get_all_ai_borders() -> Array[Vector2i]:
+	var borders: Array[Vector2i] = []
+	for y in range(Config.GRID_SIZE):
+		for x in range(Config.GRID_SIZE):
+			if is_ai_border_tile(x, y):
+				borders.append(Vector2i(x, y))
+	return borders
+
 # =============================================================================
 # GAME STATUS
 # =============================================================================
 
 func check_victory() -> bool:
-	return tiles_owned >= Config.TARGET_TILES
+	# Player wins if AI has no tiles left
+	return ai_tiles_owned <= 0
+
+func check_defeat() -> bool:
+	# Player loses if they have no tiles left
+	return tiles_owned <= 0
 
 func get_star_rating() -> int:
 	if turn_number <= Config.RATING_PERFECT_TURNS:

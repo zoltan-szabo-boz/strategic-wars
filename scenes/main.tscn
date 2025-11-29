@@ -265,18 +265,18 @@ layout_mode = 2
 
 [node name="HelpLabel" type="Label" parent="HelpPanel/VBox"]
 layout_mode = 2
-text = "GOAL: Capture 25 tiles.
+text = "GOAL: Eliminate the enemy (🔴 red)!
 
 Click a border tile to select it.
 Use sliders to assign units.
 Press END TURN to finish your turn and resolve combat.
 
-Tiles give resources each turn (on the turn they are occupied).
+Tiles give resources each turn.
 Spend resources to train new units.
-You can (and after early game should) attack more than one tile per turn.
+You can attack multiple tiles per turn.
 
-Combat: stronger army wins, the bigger the gap in normalized strength the more decisive the win.
-Losing side retreats at 50% casualties max."
+Combat: stronger army wins.
+The enemy AI also expands and attacks!"
 horizontal_alignment = 1
 
 [node name="CloseHelpBtn" type="Button" parent="HelpPanel/VBox"]

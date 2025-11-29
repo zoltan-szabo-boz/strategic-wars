@@ -87,6 +87,7 @@ const TILE_COLORS := {
 	"neutral": Color(0.5, 0.5, 0.5),         # Gray
 	"border": Color(0.6, 0.55, 0.5),         # Brownish gray for attackable
 	"selected": Color(1.0, 1.0, 1.0, 0.3),   # White overlay
+	"ai": Color(0.85, 0.29, 0.29),           # Red
 }
 
 const RESOURCE_ICONS := {
@@ -271,6 +272,8 @@ func _update_tile_button(x: int, y: int) -> void:
 	var color: Color
 	if tile.owner == Config.TileOwner.PLAYER:
 		color = TILE_COLORS["player"]
+	elif tile.owner == Config.TileOwner.AI:
+		color = TILE_COLORS["ai"]
 	elif GameState.is_border_tile(x, y):
 		color = TILE_COLORS["border"]
 	else:
@@ -299,11 +302,16 @@ func _update_tile_button(x: int, y: int) -> void:
 	pressed_style.bg_color = color.darkened(0.1)
 	btn.add_theme_stylebox_override("pressed", pressed_style)
 
-	# Set text: resource icon + production (or defense for neutrals)
+	# Set text: resource icon + production (or defense for neutrals/AI)
 	var icon: String = RESOURCE_ICONS.get(tile.resource_type, "?")
 	if tile.owner == Config.TileOwner.PLAYER:
 		if tile.resource_type == Config.ResourceType.ALL:
 			btn.text = icon  # Just star for capital
+		else:
+			btn.text = "%s%d" % [icon, tile.production]
+	elif tile.owner == Config.TileOwner.AI:
+		if tile.resource_type == Config.ResourceType.ALL:
+			btn.text = icon  # Just star for AI capital
 		else:
 			btn.text = "%s%d" % [icon, tile.production]
 	else:
@@ -358,7 +366,7 @@ func _refresh_army() -> void:
 
 func _refresh_turn_info() -> void:
 	turn_label.text = "Turn: %d" % GameState.turn_number
-	tiles_label.text = "Tiles: %d/%d" % [GameState.tiles_owned, Config.TARGET_TILES]
+	tiles_label.text = "Tiles: 🔵%d vs 🔴%d" % [GameState.tiles_owned, GameState.ai_tiles_owned]
 
 func _refresh_tile_info() -> void:
 	var coord := GameState.selected_tile
@@ -690,9 +698,14 @@ func _on_end_turn() -> void:
 	turn_combat_results = []
 	turn_income = {"manpower": 0, "goods": 0, "supplies": 0}
 
-	_process_combat()   # Combat first - capture tiles
-	_process_income()   # Then collect income (including from newly captured)
-	_check_victory()
+	_process_combat()   # Player combat first - capture tiles
+	_process_income()   # Then collect player income
+	_check_game_over()
+
+	if not GameState.game_over:
+		# AI turn
+		_process_ai_turn()
+		_check_game_over()
 
 	if not GameState.game_over:
 		GameState.turn_number += 1
@@ -736,20 +749,32 @@ func _process_combat() -> void:
 			continue
 
 		var tile: GameState.MapTile = GameState.get_tile(coord.x, coord.y)
-		if tile.owner != Config.TileOwner.NEUTRAL:
-			continue  # Already captured somehow
+		if tile.owner == Config.TileOwner.PLAYER:
+			continue  # Already owned
 
 		_resolve_combat(coord, assigned, tile)
 
 func _resolve_combat(coord: Vector2i, attackers: Dictionary, tile: GameState.MapTile) -> void:
-	# Calculate attacker power (vs neutral, no RPS)
+	# Calculate attacker power
 	var attacker_power: float = (
 		attackers["pikemen"] * Config.PIKE_POWER +
 		attackers["cavalry"] * Config.CAV_POWER +
 		attackers["archers"] * Config.ARCHER_POWER
 	)
 
-	var defender_power: float = tile.defense
+	# Defender power depends on tile type
+	var defender_power: float
+	var is_ai_tile: bool = tile.owner == Config.TileOwner.AI
+
+	if is_ai_tile:
+		# AI defends with its army (simplified: uses total army for any tile defense)
+		defender_power = (
+			GameState.ai_army["pikemen"] * Config.PIKE_POWER +
+			GameState.ai_army["cavalry"] * Config.CAV_POWER +
+			GameState.ai_army["archers"] * Config.ARCHER_POWER
+		)
+	else:
+		defender_power = tile.defense
 
 	if attacker_power <= 0:
 		return  # No attack
@@ -763,18 +788,15 @@ func _resolve_combat(coord: Vector2i, attackers: Dictionary, tile: GameState.Map
 	var defender_casualties_pct: float
 
 	if attacker_wins:
-		# Attacker wins - defender retreats at 50%
 		defender_casualties_pct = Config.RETREAT_THRESHOLD
-		# Attacker takes damage proportional to defender's strength
-		power_ratio = defender_power / attacker_power
+		power_ratio = defender_power / max(attacker_power, 1.0)
 		attacker_casualties_pct = power_ratio * Config.RETREAT_THRESHOLD
 	else:
-		# Defender wins - attacker retreats at 50%
 		attacker_casualties_pct = Config.RETREAT_THRESHOLD
-		power_ratio = attacker_power / defender_power
+		power_ratio = attacker_power / max(defender_power, 1.0)
 		defender_casualties_pct = power_ratio * Config.RETREAT_THRESHOLD
 
-	# Apply attacker casualties (return survivors to pool)
+	# Apply attacker casualties
 	var surviving_pike: int = int(ceil(attackers["pikemen"] * (1.0 - attacker_casualties_pct)))
 	var surviving_cav: int = int(ceil(attackers["cavalry"] * (1.0 - attacker_casualties_pct)))
 	var surviving_archer: int = int(ceil(attackers["archers"] * (1.0 - attacker_casualties_pct)))
@@ -783,10 +805,19 @@ func _resolve_combat(coord: Vector2i, attackers: Dictionary, tile: GameState.Map
 	var lost_cav: int = attackers["cavalry"] - surviving_cav
 	var lost_archer: int = attackers["archers"] - surviving_archer
 
-	# Deduct losses from army
+	# Deduct losses from player army
 	GameState.army["pikemen"] -= lost_pike
 	GameState.army["cavalry"] -= lost_cav
 	GameState.army["archers"] -= lost_archer
+
+	# Apply defender casualties if AI tile
+	if is_ai_tile and attacker_wins:
+		var ai_lost_pike: int = int(GameState.ai_army["pikemen"] * defender_casualties_pct)
+		var ai_lost_cav: int = int(GameState.ai_army["cavalry"] * defender_casualties_pct)
+		var ai_lost_archer: int = int(GameState.ai_army["archers"] * defender_casualties_pct)
+		GameState.ai_army["pikemen"] -= ai_lost_pike
+		GameState.ai_army["cavalry"] -= ai_lost_cav
+		GameState.ai_army["archers"] -= ai_lost_archer
 
 	# If attacker wins, capture tile
 	if attacker_wins:
@@ -807,19 +838,178 @@ func _resolve_combat(coord: Vector2i, attackers: Dictionary, tile: GameState.Map
 	}
 	turn_combat_results.append(combat_result)
 
-func _check_victory() -> void:
+func _check_game_over() -> void:
 	if GameState.check_victory():
 		GameState.game_over = true
 		var stars := GameState.get_star_rating()
 		var star_text := ""
 		for i in range(stars):
-			star_text += "*"
+			star_text += "⭐"
 		if stars == 0:
 			star_text = "Complete"
 
-		victory_label.text = "VICTORY!\n\nYou conquered %d tiles\nin %d turns\n\nRating: %s" % [
-			GameState.tiles_owned,
+		victory_label.text = "VICTORY!\n\nYou eliminated the enemy\nin %d turns\n\nRating: %s" % [
 			GameState.turn_number,
 			star_text
 		]
 		victory_panel.show()
+	elif GameState.check_defeat():
+		GameState.game_over = true
+		victory_label.text = "DEFEAT!\n\nThe enemy conquered\nyour territory\n\nTry again!"
+		victory_panel.show()
+
+# =============================================================================
+# AI TURN PROCESSING
+# =============================================================================
+
+func _process_ai_turn() -> void:
+	_ai_collect_income()
+	_ai_train_units()
+	_ai_attack()
+
+func _ai_collect_income() -> void:
+	# Capital income
+	GameState.ai_resources["manpower"] += Config.CAPITAL_PROD_MANPOWER
+	GameState.ai_resources["goods"] += Config.CAPITAL_PROD_GOODS
+	GameState.ai_resources["supplies"] += Config.CAPITAL_PROD_SUPPLIES
+
+	# Income from owned tiles
+	for y in range(Config.GRID_SIZE):
+		for x in range(Config.GRID_SIZE):
+			var tile: GameState.MapTile = GameState.get_tile(x, y)
+			if tile.owner == Config.TileOwner.AI and tile.resource_type != Config.ResourceType.ALL:
+				var res_key := _resource_type_to_key(tile.resource_type)
+				GameState.ai_resources[res_key] += tile.production
+
+func _ai_train_units() -> void:
+	# AI spends resources greedily - train as many units as possible
+	# Prioritize: pikemen (balanced), then cavalry (power), then archers
+	var trained := true
+	while trained:
+		trained = false
+
+		# Try to train pikeman
+		var pike_cost := Config.get_unit_cost(Config.UnitType.PIKEMAN)
+		if _ai_can_afford(pike_cost):
+			_ai_spend_resources(pike_cost)
+			GameState.ai_army["pikemen"] += 1
+			trained = true
+			continue
+
+		# Try to train archer (cheaper)
+		var archer_cost := Config.get_unit_cost(Config.UnitType.ARCHER)
+		if _ai_can_afford(archer_cost):
+			_ai_spend_resources(archer_cost)
+			GameState.ai_army["archers"] += 1
+			trained = true
+			continue
+
+		# Try to train cavalry
+		var cav_cost := Config.get_unit_cost(Config.UnitType.CAVALRY)
+		if _ai_can_afford(cav_cost):
+			_ai_spend_resources(cav_cost)
+			GameState.ai_army["cavalry"] += 1
+			trained = true
+			continue
+
+func _ai_can_afford(cost: Dictionary) -> bool:
+	return (GameState.ai_resources["manpower"] >= cost.get("manpower", 0) and
+			GameState.ai_resources["goods"] >= cost.get("goods", 0) and
+			GameState.ai_resources["supplies"] >= cost.get("supplies", 0))
+
+func _ai_spend_resources(cost: Dictionary) -> void:
+	GameState.ai_resources["manpower"] -= cost.get("manpower", 0)
+	GameState.ai_resources["goods"] -= cost.get("goods", 0)
+	GameState.ai_resources["supplies"] -= cost.get("supplies", 0)
+
+func _ai_attack() -> void:
+	# Get all tiles AI can attack
+	var borders := GameState.get_all_ai_borders()
+	if borders.is_empty():
+		return
+
+	# Simple AI: attack one random border tile with full army
+	var target: Vector2i = borders[randi() % borders.size()]
+	var tile: GameState.MapTile = GameState.get_tile(target.x, target.y)
+
+	# Calculate AI army power
+	var ai_power: float = (
+		GameState.ai_army["pikemen"] * Config.PIKE_POWER +
+		GameState.ai_army["cavalry"] * Config.CAV_POWER +
+		GameState.ai_army["archers"] * Config.ARCHER_POWER
+	)
+
+	if ai_power <= 0:
+		return  # No army to attack with
+
+	# Determine defender power
+	var defender_power: float
+	var is_player_tile: bool = tile.owner == Config.TileOwner.PLAYER
+
+	if is_player_tile:
+		# Player defends with army
+		defender_power = (
+			GameState.army["pikemen"] * Config.PIKE_POWER +
+			GameState.army["cavalry"] * Config.CAV_POWER +
+			GameState.army["archers"] * Config.ARCHER_POWER
+		)
+	else:
+		defender_power = tile.defense
+
+	# Determine outcome
+	var ai_wins := ai_power > defender_power
+
+	# Calculate casualties
+	var power_ratio: float
+	var ai_casualties_pct: float
+	var defender_casualties_pct: float
+
+	if ai_wins:
+		defender_casualties_pct = Config.RETREAT_THRESHOLD
+		power_ratio = defender_power / max(ai_power, 1.0)
+		ai_casualties_pct = power_ratio * Config.RETREAT_THRESHOLD
+	else:
+		ai_casualties_pct = Config.RETREAT_THRESHOLD
+		power_ratio = ai_power / max(defender_power, 1.0)
+		defender_casualties_pct = power_ratio * Config.RETREAT_THRESHOLD
+
+	# Apply AI casualties
+	var ai_lost_pike: int = int(GameState.ai_army["pikemen"] * ai_casualties_pct)
+	var ai_lost_cav: int = int(GameState.ai_army["cavalry"] * ai_casualties_pct)
+	var ai_lost_archer: int = int(GameState.ai_army["archers"] * ai_casualties_pct)
+
+	GameState.ai_army["pikemen"] -= ai_lost_pike
+	GameState.ai_army["cavalry"] -= ai_lost_cav
+	GameState.ai_army["archers"] -= ai_lost_archer
+
+	# Apply player casualties if defending player tile
+	if is_player_tile and ai_wins:
+		var player_lost_pike: int = int(GameState.army["pikemen"] * defender_casualties_pct)
+		var player_lost_cav: int = int(GameState.army["cavalry"] * defender_casualties_pct)
+		var player_lost_archer: int = int(GameState.army["archers"] * defender_casualties_pct)
+		GameState.army["pikemen"] -= player_lost_pike
+		GameState.army["cavalry"] -= player_lost_cav
+		GameState.army["archers"] -= player_lost_archer
+
+	# If AI wins, capture tile
+	if ai_wins:
+		GameState.set_tile_owner(target.x, target.y, Config.TileOwner.AI)
+
+	# Add to combat report
+	var combat_result := {
+		"tile": target,
+		"role": "Defender",
+		"victory": not ai_wins,
+		"attackers": {"pikemen": 0, "cavalry": 0, "archers": 0},  # AI attackers not shown in detail
+		"defender_power": int(ai_power),
+		"casualties": {
+			"pikemen": 0 if not is_player_tile else int(GameState.army["pikemen"] * defender_casualties_pct) if ai_wins else 0,
+			"cavalry": 0 if not is_player_tile else int(GameState.army["cavalry"] * defender_casualties_pct) if ai_wins else 0,
+			"archers": 0 if not is_player_tile else int(GameState.army["archers"] * defender_casualties_pct) if ai_wins else 0,
+		}
+	}
+	if is_player_tile:
+		combat_result["casualties"]["pikemen"] = int(GameState.army["pikemen"] * defender_casualties_pct) if ai_wins else 0
+		combat_result["casualties"]["cavalry"] = int(GameState.army["cavalry"] * defender_casualties_pct) if ai_wins else 0
+		combat_result["casualties"]["archers"] = int(GameState.army["archers"] * defender_casualties_pct) if ai_wins else 0
+	turn_combat_results.append(combat_result)
