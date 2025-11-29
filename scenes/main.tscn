@@ -1,0 +1,476 @@
+[gd_scene load_steps=3 format=3 uid="uid://bsr4t47xwg03y"]
+
+[ext_resource type="Script" uid="uid://cu81vtg5y6ybt" path="res://scripts/main.gd" id="1_main"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_training"]
+bg_color = Color(0.12, 0.12, 0.18, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.4, 0.4, 0.5, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_main")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.15, 0.15, 0.2, 1)
+
+[node name="GameContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="LeftPanel" type="VBoxContainer" parent="GameContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="TrainUnitsBtn" type="Button" parent="GameContainer/LeftPanel"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+text = "TRAIN UNITS"
+
+[node name="Separator1" type="HSeparator" parent="GameContainer/LeftPanel"]
+layout_mode = 2
+
+[node name="AssignLabel" type="Label" parent="GameContainer/LeftPanel"]
+layout_mode = 2
+text = "ASSIGN TO BORDER"
+
+[node name="AssignPanel" type="VBoxContainer" parent="GameContainer/LeftPanel"]
+visible = false
+layout_mode = 2
+
+[node name="PikeRow" type="HBoxContainer" parent="GameContainer/LeftPanel/AssignPanel"]
+layout_mode = 2
+
+[node name="PikeLabel" type="Label" parent="GameContainer/LeftPanel/AssignPanel/PikeRow"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+text = "Pike: 0"
+
+[node name="PikeSlider" type="HSlider" parent="GameContainer/LeftPanel/AssignPanel/PikeRow"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 0.0
+
+[node name="CavRow" type="HBoxContainer" parent="GameContainer/LeftPanel/AssignPanel"]
+layout_mode = 2
+
+[node name="CavLabel" type="Label" parent="GameContainer/LeftPanel/AssignPanel/CavRow"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+text = "Cav: 0"
+
+[node name="CavSlider" type="HSlider" parent="GameContainer/LeftPanel/AssignPanel/CavRow"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 0.0
+
+[node name="ArcherRow" type="HBoxContainer" parent="GameContainer/LeftPanel/AssignPanel"]
+layout_mode = 2
+
+[node name="ArcherLabel" type="Label" parent="GameContainer/LeftPanel/AssignPanel/ArcherRow"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+text = "Arch: 0"
+
+[node name="ArcherSlider" type="HSlider" parent="GameContainer/LeftPanel/AssignPanel/ArcherRow"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 0.0
+
+[node name="Separator2" type="HSeparator" parent="GameContainer/LeftPanel"]
+layout_mode = 2
+
+[node name="Spacer" type="Control" parent="GameContainer/LeftPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="EndTurnBtn" type="Button" parent="GameContainer/LeftPanel"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+text = "END TURN"
+
+[node name="MapPanel" type="PanelContainer" parent="GameContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="MapContainer" type="GridContainer" parent="GameContainer/MapPanel"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+columns = 7
+
+[node name="RightPanel" type="VBoxContainer" parent="GameContainer"]
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="TurnLabel" type="Label" parent="GameContainer/RightPanel"]
+layout_mode = 2
+text = "Turn: 1"
+
+[node name="TilesLabel" type="Label" parent="GameContainer/RightPanel"]
+layout_mode = 2
+text = "Tiles: 1/25"
+
+[node name="Separator3" type="HSeparator" parent="GameContainer/RightPanel"]
+layout_mode = 2
+
+[node name="ResourcesLabel" type="Label" parent="GameContainer/RightPanel"]
+layout_mode = 2
+text = "RESOURCES"
+
+[node name="ManpowerLabel" type="Label" parent="GameContainer/RightPanel"]
+layout_mode = 2
+text = "Manpower: 30"
+
+[node name="GoodsLabel" type="Label" parent="GameContainer/RightPanel"]
+layout_mode = 2
+text = "Goods: 20"
+
+[node name="SuppliesLabel" type="Label" parent="GameContainer/RightPanel"]
+layout_mode = 2
+text = "Supplies: 25"
+
+[node name="Separator4" type="HSeparator" parent="GameContainer/RightPanel"]
+layout_mode = 2
+
+[node name="ArmyLabel" type="Label" parent="GameContainer/RightPanel"]
+layout_mode = 2
+text = "ARMY (avail/total)"
+
+[node name="PikemenLabel" type="Label" parent="GameContainer/RightPanel"]
+layout_mode = 2
+text = "Pikemen: 2 (2)"
+
+[node name="CavalryLabel" type="Label" parent="GameContainer/RightPanel"]
+layout_mode = 2
+text = "Cavalry: 1 (1)"
+
+[node name="ArchersLabel" type="Label" parent="GameContainer/RightPanel"]
+layout_mode = 2
+text = "Archers: 2 (2)"
+
+[node name="Separator5" type="HSeparator" parent="GameContainer/RightPanel"]
+layout_mode = 2
+
+[node name="TileInfoPanel" type="PanelContainer" parent="GameContainer/RightPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TileInfoLabel" type="Label" parent="GameContainer/RightPanel/TileInfoPanel"]
+layout_mode = 2
+text = "Click a tile to select"
+vertical_alignment = 1
+
+[node name="VictoryPanel" type="PanelContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -100.0
+offset_right = 150.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VictoryLabel" type="Label" parent="VictoryPanel"]
+layout_mode = 2
+text = "VICTORY!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="NewGameBtn" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -141.0
+offset_top = 678.0
+offset_right = -48.0
+offset_bottom = 709.0
+grow_horizontal = 0
+text = "New Game"
+
+[node name="HelpBtn" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -43.0
+offset_top = 678.0
+offset_right = -8.0
+offset_bottom = 709.0
+grow_horizontal = 0
+text = "?"
+
+[node name="HelpPanel" type="PanelContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -120.0
+offset_right = 200.0
+offset_bottom = 120.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_training")
+
+[node name="VBox" type="VBoxContainer" parent="HelpPanel"]
+layout_mode = 2
+
+[node name="HelpLabel" type="Label" parent="HelpPanel/VBox"]
+layout_mode = 2
+text = "GOAL: Capture 25 tiles.
+
+Click a border tile to select it.
+Use sliders to assign units.
+Press END TURN to attack.
+
+Tiles give resources each turn.
+Spend resources to build units.
+
+Combat: stronger army wins.
+Losing side retreats at 50% casualties."
+horizontal_alignment = 1
+
+[node name="CloseHelpBtn" type="Button" parent="HelpPanel/VBox"]
+layout_mode = 2
+text = "Close"
+
+[node name="TrainingPanel" type="PanelContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -280.0
+offset_top = -220.0
+offset_right = 280.0
+offset_bottom = 220.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_training")
+
+[node name="VBox" type="VBoxContainer" parent="TrainingPanel"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="TrainingPanel/VBox"]
+layout_mode = 2
+text = "TRAIN UNITS"
+horizontal_alignment = 1
+
+[node name="ResourcesPanel" type="PanelContainer" parent="TrainingPanel/VBox"]
+layout_mode = 2
+
+[node name="ResourcesHBox" type="HBoxContainer" parent="TrainingPanel/VBox/ResourcesPanel"]
+layout_mode = 2
+alignment = 1
+
+[node name="ManpowerDraft" type="Label" parent="TrainingPanel/VBox/ResourcesPanel/ResourcesHBox"]
+layout_mode = 2
+text = "Manpower: 30"
+
+[node name="Sep1" type="VSeparator" parent="TrainingPanel/VBox/ResourcesPanel/ResourcesHBox"]
+layout_mode = 2
+
+[node name="GoodsDraft" type="Label" parent="TrainingPanel/VBox/ResourcesPanel/ResourcesHBox"]
+layout_mode = 2
+text = "Goods: 20"
+
+[node name="Sep2" type="VSeparator" parent="TrainingPanel/VBox/ResourcesPanel/ResourcesHBox"]
+layout_mode = 2
+
+[node name="SuppliesDraft" type="Label" parent="TrainingPanel/VBox/ResourcesPanel/ResourcesHBox"]
+layout_mode = 2
+text = "Supplies: 25"
+
+[node name="Separator" type="HSeparator" parent="TrainingPanel/VBox"]
+layout_mode = 2
+
+[node name="UnitsContainer" type="VBoxContainer" parent="TrainingPanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PikeRow" type="HBoxContainer" parent="TrainingPanel/VBox/UnitsContainer"]
+layout_mode = 2
+
+[node name="PikeInfo" type="VBoxContainer" parent="TrainingPanel/VBox/UnitsContainer/PikeRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PikeName" type="Label" parent="TrainingPanel/VBox/UnitsContainer/PikeRow/PikeInfo"]
+layout_mode = 2
+text = "PIKEMAN"
+
+[node name="PikeCost" type="Label" parent="TrainingPanel/VBox/UnitsContainer/PikeRow/PikeInfo"]
+layout_mode = 2
+text = "Cost: M5 G2 S3  |  Power: 10"
+
+[node name="PikeRPS" type="Label" parent="TrainingPanel/VBox/UnitsContainer/PikeRow/PikeInfo"]
+layout_mode = 2
+text = "Strong vs: Cavalry  |  Weak vs: Archer"
+
+[node name="PikeDesc" type="Label" parent="TrainingPanel/VBox/UnitsContainer/PikeRow/PikeInfo"]
+layout_mode = 2
+text = "Balanced defensive unit"
+
+[node name="PikeControls" type="HBoxContainer" parent="TrainingPanel/VBox/UnitsContainer/PikeRow"]
+layout_mode = 2
+
+[node name="PikeMinus" type="Button" parent="TrainingPanel/VBox/UnitsContainer/PikeRow/PikeControls"]
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+text = "-"
+
+[node name="PikeCount" type="Label" parent="TrainingPanel/VBox/UnitsContainer/PikeRow/PikeControls"]
+custom_minimum_size = Vector2(30, 0)
+layout_mode = 2
+text = "0"
+horizontal_alignment = 1
+
+[node name="PikePlus" type="Button" parent="TrainingPanel/VBox/UnitsContainer/PikeRow/PikeControls"]
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+text = "+"
+
+[node name="CavRow" type="HBoxContainer" parent="TrainingPanel/VBox/UnitsContainer"]
+layout_mode = 2
+
+[node name="CavInfo" type="VBoxContainer" parent="TrainingPanel/VBox/UnitsContainer/CavRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CavName" type="Label" parent="TrainingPanel/VBox/UnitsContainer/CavRow/CavInfo"]
+layout_mode = 2
+text = "CAVALRY"
+
+[node name="CavCost" type="Label" parent="TrainingPanel/VBox/UnitsContainer/CavRow/CavInfo"]
+layout_mode = 2
+text = "Cost: M8 G5 S5  |  Power: 15"
+
+[node name="CavRPS" type="Label" parent="TrainingPanel/VBox/UnitsContainer/CavRow/CavInfo"]
+layout_mode = 2
+text = "Strong vs: Archer  |  Weak vs: Pikeman"
+
+[node name="CavDesc" type="Label" parent="TrainingPanel/VBox/UnitsContainer/CavRow/CavInfo"]
+layout_mode = 2
+text = "Powerful but expensive"
+
+[node name="CavControls" type="HBoxContainer" parent="TrainingPanel/VBox/UnitsContainer/CavRow"]
+layout_mode = 2
+
+[node name="CavMinus" type="Button" parent="TrainingPanel/VBox/UnitsContainer/CavRow/CavControls"]
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+text = "-"
+
+[node name="CavCount" type="Label" parent="TrainingPanel/VBox/UnitsContainer/CavRow/CavControls"]
+custom_minimum_size = Vector2(30, 0)
+layout_mode = 2
+text = "0"
+horizontal_alignment = 1
+
+[node name="CavPlus" type="Button" parent="TrainingPanel/VBox/UnitsContainer/CavRow/CavControls"]
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+text = "+"
+
+[node name="ArcherRow" type="HBoxContainer" parent="TrainingPanel/VBox/UnitsContainer"]
+layout_mode = 2
+
+[node name="ArcherInfo" type="VBoxContainer" parent="TrainingPanel/VBox/UnitsContainer/ArcherRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ArcherName" type="Label" parent="TrainingPanel/VBox/UnitsContainer/ArcherRow/ArcherInfo"]
+layout_mode = 2
+text = "ARCHER"
+
+[node name="ArcherCost" type="Label" parent="TrainingPanel/VBox/UnitsContainer/ArcherRow/ArcherInfo"]
+layout_mode = 2
+text = "Cost: M4 G4 S2  |  Power: 8"
+
+[node name="ArcherRPS" type="Label" parent="TrainingPanel/VBox/UnitsContainer/ArcherRow/ArcherInfo"]
+layout_mode = 2
+text = "Strong vs: Pikeman  |  Weak vs: Cavalry"
+
+[node name="ArcherDesc" type="Label" parent="TrainingPanel/VBox/UnitsContainer/ArcherRow/ArcherInfo"]
+layout_mode = 2
+text = "Cheapest supplies cost"
+
+[node name="ArcherControls" type="HBoxContainer" parent="TrainingPanel/VBox/UnitsContainer/ArcherRow"]
+layout_mode = 2
+
+[node name="ArcherMinus" type="Button" parent="TrainingPanel/VBox/UnitsContainer/ArcherRow/ArcherControls"]
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+text = "-"
+
+[node name="ArcherCount" type="Label" parent="TrainingPanel/VBox/UnitsContainer/ArcherRow/ArcherControls"]
+custom_minimum_size = Vector2(30, 0)
+layout_mode = 2
+text = "0"
+horizontal_alignment = 1
+
+[node name="ArcherPlus" type="Button" parent="TrainingPanel/VBox/UnitsContainer/ArcherRow/ArcherControls"]
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+text = "+"
+
+[node name="Separator2" type="HSeparator" parent="TrainingPanel/VBox"]
+layout_mode = 2
+
+[node name="ButtonsHBox" type="HBoxContainer" parent="TrainingPanel/VBox"]
+layout_mode = 2
+alignment = 1
+
+[node name="CancelTrainingBtn" type="Button" parent="TrainingPanel/VBox/ButtonsHBox"]
+custom_minimum_size = Vector2(100, 35)
+layout_mode = 2
+text = "Cancel"
+
+[node name="Spacer" type="Control" parent="TrainingPanel/VBox/ButtonsHBox"]
+custom_minimum_size = Vector2(20, 0)
+layout_mode = 2
+
+[node name="ConfirmTrainingBtn" type="Button" parent="TrainingPanel/VBox/ButtonsHBox"]
+custom_minimum_size = Vector2(100, 35)
+layout_mode = 2
+text = "Confirm"
