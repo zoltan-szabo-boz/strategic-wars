@@ -983,10 +983,13 @@ func _ai_attack() -> void:
 	GameState.ai_army["archers"] -= ai_lost_archer
 
 	# Apply player casualties if defending player tile
+	var player_lost_pike: int = 0
+	var player_lost_cav: int = 0
+	var player_lost_archer: int = 0
 	if is_player_tile and ai_wins:
-		var player_lost_pike: int = int(GameState.army["pikemen"] * defender_casualties_pct)
-		var player_lost_cav: int = int(GameState.army["cavalry"] * defender_casualties_pct)
-		var player_lost_archer: int = int(GameState.army["archers"] * defender_casualties_pct)
+		player_lost_pike = int(GameState.army["pikemen"] * defender_casualties_pct)
+		player_lost_cav = int(GameState.army["cavalry"] * defender_casualties_pct)
+		player_lost_archer = int(GameState.army["archers"] * defender_casualties_pct)
 		GameState.army["pikemen"] -= player_lost_pike
 		GameState.army["cavalry"] -= player_lost_cav
 		GameState.army["archers"] -= player_lost_archer
@@ -995,21 +998,18 @@ func _ai_attack() -> void:
 	if ai_wins:
 		GameState.set_tile_owner(target.x, target.y, Config.TileOwner.AI)
 
-	# Add to combat report
-	var combat_result := {
-		"tile": target,
-		"role": "Defender",
-		"victory": not ai_wins,
-		"attackers": {"pikemen": 0, "cavalry": 0, "archers": 0},  # AI attackers not shown in detail
-		"defender_power": int(ai_power),
-		"casualties": {
-			"pikemen": 0 if not is_player_tile else int(GameState.army["pikemen"] * defender_casualties_pct) if ai_wins else 0,
-			"cavalry": 0 if not is_player_tile else int(GameState.army["cavalry"] * defender_casualties_pct) if ai_wins else 0,
-			"archers": 0 if not is_player_tile else int(GameState.army["archers"] * defender_casualties_pct) if ai_wins else 0,
-		}
-	}
+	# Only add to combat report if player was involved (defending their tile)
 	if is_player_tile:
-		combat_result["casualties"]["pikemen"] = int(GameState.army["pikemen"] * defender_casualties_pct) if ai_wins else 0
-		combat_result["casualties"]["cavalry"] = int(GameState.army["cavalry"] * defender_casualties_pct) if ai_wins else 0
-		combat_result["casualties"]["archers"] = int(GameState.army["archers"] * defender_casualties_pct) if ai_wins else 0
-	turn_combat_results.append(combat_result)
+		var combat_result := {
+			"tile": target,
+			"role": "Defender",
+			"victory": not ai_wins,
+			"attackers": {"pikemen": 0, "cavalry": 0, "archers": 0},
+			"defender_power": int(ai_power),
+			"casualties": {
+				"pikemen": player_lost_pike,
+				"cavalry": player_lost_cav,
+				"archers": player_lost_archer,
+			},
+		}
+		turn_combat_results.append(combat_result)
