@@ -474,3 +474,67 @@ layout_mode = 2
 custom_minimum_size = Vector2(100, 35)
 layout_mode = 2
 text = "Confirm"
+
+[node name="TurnReportPanel" type="PanelContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -200.0
+offset_right = 250.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_training")
+
+[node name="VBox" type="VBoxContainer" parent="TurnReportPanel"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="TurnReportPanel/VBox"]
+layout_mode = 2
+text = "TURN REPORT"
+horizontal_alignment = 1
+
+[node name="Separator1" type="HSeparator" parent="TurnReportPanel/VBox"]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="TurnReportPanel/VBox"]
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ReportContent" type="VBoxContainer" parent="TurnReportPanel/VBox/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CombatLabel" type="Label" parent="TurnReportPanel/VBox/ScrollContainer/ReportContent"]
+layout_mode = 2
+text = "COMBAT"
+
+[node name="CombatReport" type="Label" parent="TurnReportPanel/VBox/ScrollContainer/ReportContent"]
+layout_mode = 2
+text = "No combat this turn."
+
+[node name="Separator2" type="HSeparator" parent="TurnReportPanel/VBox/ScrollContainer/ReportContent"]
+layout_mode = 2
+
+[node name="IncomeLabel" type="Label" parent="TurnReportPanel/VBox/ScrollContainer/ReportContent"]
+layout_mode = 2
+text = "INCOME"
+
+[node name="IncomeReport" type="Label" parent="TurnReportPanel/VBox/ScrollContainer/ReportContent"]
+layout_mode = 2
+text = "Resources gained this turn."
+
+[node name="Separator3" type="HSeparator" parent="TurnReportPanel/VBox"]
+layout_mode = 2
+
+[node name="CloseReportBtn" type="Button" parent="TurnReportPanel/VBox"]
+custom_minimum_size = Vector2(100, 35)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Continue"

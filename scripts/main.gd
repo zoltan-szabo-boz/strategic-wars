@@ -45,6 +45,16 @@ var confirm_training_btn: Button
 # Draft state for training
 var draft_units: Dictionary = {"pikemen": 0, "cavalry": 0, "archers": 0}
 
+# Turn report panel
+var turn_report_panel: PanelContainer
+var combat_report_label: Label
+var income_report_label: Label
+var close_report_btn: Button
+
+# Turn report data
+var turn_combat_results: Array = []  # Array of combat result dictionaries
+var turn_income: Dictionary = {"manpower": 0, "goods": 0, "supplies": 0}
+
 # Assignment panel
 var assign_panel: VBoxContainer
 var pike_slider: HSlider
@@ -133,6 +143,12 @@ func _get_node_references() -> void:
 	cancel_training_btn = get_node_or_null("TrainingPanel/VBox/ButtonsHBox/CancelTrainingBtn")
 	confirm_training_btn = get_node_or_null("TrainingPanel/VBox/ButtonsHBox/ConfirmTrainingBtn")
 
+	# Turn report panel
+	turn_report_panel = get_node_or_null("TurnReportPanel")
+	combat_report_label = get_node_or_null("TurnReportPanel/VBox/ScrollContainer/ReportContent/CombatReport")
+	income_report_label = get_node_or_null("TurnReportPanel/VBox/ScrollContainer/ReportContent/IncomeReport")
+	close_report_btn = get_node_or_null("TurnReportPanel/VBox/CloseReportBtn")
+
 	assign_panel = get_node_or_null("GameContainer/LeftPanel/AssignPanel")
 	pike_slider = get_node_or_null("GameContainer/LeftPanel/AssignPanel/PikeRow/PikeSlider")
 	pike_label = get_node_or_null("GameContainer/LeftPanel/AssignPanel/PikeRow/PikeLabel")
@@ -176,6 +192,9 @@ func _connect_signals() -> void:
 	if confirm_training_btn:
 		confirm_training_btn.pressed.connect(_on_confirm_training)
 
+	if close_report_btn:
+		close_report_btn.pressed.connect(_on_close_report)
+
 	if pike_slider:
 		pike_slider.value_changed.connect(_on_pike_slider_changed)
 	if cav_slider:
@@ -209,8 +228,12 @@ func _start_new_game() -> void:
 		help_panel.hide()
 	if training_panel:
 		training_panel.hide()
+	if turn_report_panel:
+		turn_report_panel.hide()
 	# Reset draft state
 	draft_units = {"pikemen": 0, "cavalry": 0, "archers": 0}
+	turn_combat_results = []
+	turn_income = {"manpower": 0, "goods": 0, "supplies": 0}
 
 # =============================================================================
 # MAP DISPLAY
@@ -603,10 +626,70 @@ func _on_close_help_pressed() -> void:
 		help_panel.hide()
 
 # =============================================================================
+# TURN REPORT
+# =============================================================================
+
+func _show_turn_report() -> void:
+	# Format combat report
+	var combat_text := ""
+	if turn_combat_results.is_empty():
+		combat_text = "No combat this turn."
+	else:
+		for result in turn_combat_results:
+			var tile_pos: Vector2i = result["tile"]
+			var victory: bool = result["victory"]
+			var casualties: Dictionary = result["casualties"]
+
+			combat_text += "Tile (%d, %d): " % [tile_pos.x, tile_pos.y]
+			combat_text += "VICTORY!\n" if victory else "DEFEAT\n"
+			combat_text += "  Role: %s\n" % result["role"]
+			combat_text += "  Enemy Defense: %d\n" % result["defender_power"]
+
+			var total_casualties: int = casualties["pikemen"] + casualties["cavalry"] + casualties["archers"]
+			if total_casualties > 0:
+				combat_text += "  Casualties: "
+				var parts: Array = []
+				if casualties["pikemen"] > 0:
+					parts.append("%d Pike" % casualties["pikemen"])
+				if casualties["cavalry"] > 0:
+					parts.append("%d Cav" % casualties["cavalry"])
+				if casualties["archers"] > 0:
+					parts.append("%d Arch" % casualties["archers"])
+				combat_text += ", ".join(parts) + "\n"
+			else:
+				combat_text += "  Casualties: None\n"
+			combat_text += "\n"
+
+	# Format income report
+	var income_text := "Manpower: +%d\nGoods: +%d\nSupplies: +%d" % [
+		turn_income["manpower"],
+		turn_income["goods"],
+		turn_income["supplies"]
+	]
+
+	# Update labels
+	if combat_report_label:
+		combat_report_label.text = combat_text.strip_edges()
+	if income_report_label:
+		income_report_label.text = income_text
+
+	# Show panel
+	if turn_report_panel:
+		turn_report_panel.show()
+
+func _on_close_report() -> void:
+	if turn_report_panel:
+		turn_report_panel.hide()
+
+# =============================================================================
 # TURN PROCESSING
 # =============================================================================
 
 func _on_end_turn() -> void:
+	# Reset report data for this turn
+	turn_combat_results = []
+	turn_income = {"manpower": 0, "goods": 0, "supplies": 0}
+
 	_process_combat()   # Combat first - capture tiles
 	_process_income()   # Then collect income (including from newly captured)
 	_check_victory()
@@ -615,12 +698,18 @@ func _on_end_turn() -> void:
 		GameState.turn_number += 1
 		GameState.clear_all_assignments()
 		_refresh_all()
+		_show_turn_report()
 
 func _process_income() -> void:
 	# Capital income
 	GameState.add_resource("manpower", Config.CAPITAL_PROD_MANPOWER)
 	GameState.add_resource("goods", Config.CAPITAL_PROD_GOODS)
 	GameState.add_resource("supplies", Config.CAPITAL_PROD_SUPPLIES)
+
+	# Track capital income for report
+	turn_income["manpower"] += Config.CAPITAL_PROD_MANPOWER
+	turn_income["goods"] += Config.CAPITAL_PROD_GOODS
+	turn_income["supplies"] += Config.CAPITAL_PROD_SUPPLIES
 
 	# Income from owned tiles
 	for y in range(Config.GRID_SIZE):
@@ -629,6 +718,8 @@ func _process_income() -> void:
 			if tile.owner == Config.TileOwner.PLAYER and tile.resource_type != Config.ResourceType.ALL:
 				var res_key := _resource_type_to_key(tile.resource_type)
 				GameState.add_resource(res_key, tile.production)
+				# Track tile income for report
+				turn_income[res_key] += tile.production
 
 func _resource_type_to_key(res_type: int) -> String:
 	match res_type:
@@ -700,6 +791,21 @@ func _resolve_combat(coord: Vector2i, attackers: Dictionary, tile: GameState.Map
 	# If attacker wins, capture tile
 	if attacker_wins:
 		GameState.set_tile_owner(coord.x, coord.y, Config.TileOwner.PLAYER)
+
+	# Track combat result for report
+	var combat_result := {
+		"tile": coord,
+		"role": "Attacker",
+		"victory": attacker_wins,
+		"attackers": attackers.duplicate(),
+		"defender_power": int(defender_power),
+		"casualties": {
+			"pikemen": lost_pike,
+			"cavalry": lost_cav,
+			"archers": lost_archer,
+		}
+	}
+	turn_combat_results.append(combat_result)
 
 func _check_victory() -> void:
 	if GameState.check_victory():
