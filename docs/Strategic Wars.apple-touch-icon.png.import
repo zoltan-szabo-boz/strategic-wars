@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cvj4ia6o80fy0"
-path="res://.godot/imported/Strategic Wars.apple-touch-icon.png-ca72ad6df882df7df512fd130089b2b0.ctex"
+path="res://.godot/imported/Strategic Wars.apple-touch-icon.png-7a73f6ae3075c7bba9a63e452cea447b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://web-build/Strategic Wars.apple-touch-icon.png"
-dest_files=["res://.godot/imported/Strategic Wars.apple-touch-icon.png-ca72ad6df882df7df512fd130089b2b0.ctex"]
+source_file="res://docs/Strategic Wars.apple-touch-icon.png"
+dest_files=["res://.godot/imported/Strategic Wars.apple-touch-icon.png-7a73f6ae3075c7bba9a63e452cea447b.ctex"]
 
 [params]
 

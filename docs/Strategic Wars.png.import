@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://0dpqy78k0ulw"
-path="res://.godot/imported/Strategic Wars.png-bd584cd033521f4726fd76975ea1266c.ctex"
+path="res://.godot/imported/Strategic Wars.png-fd3e4238c9230f6ad4604ecd9d663f54.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://web-build/Strategic Wars.png"
-dest_files=["res://.godot/imported/Strategic Wars.png-bd584cd033521f4726fd76975ea1266c.ctex"]
+source_file="res://docs/Strategic Wars.png"
+dest_files=["res://.godot/imported/Strategic Wars.png-fd3e4238c9230f6ad4604ecd9d663f54.ctex"]
 
 [params]
 
