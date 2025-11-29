@@ -110,11 +110,6 @@ layout_mode = 2
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="EndTurnBtn" type="Button" parent="GameContainer/LeftPanel"]
-custom_minimum_size = Vector2(0, 50)
-layout_mode = 2
-text = "END TURN"
-
 [node name="MapPanel" type="PanelContainer" parent="GameContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -212,27 +207,42 @@ vertical_alignment = 1
 
 [node name="NewGameBtn" type="Button" parent="."]
 layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -141.0
-offset_top = 678.0
-offset_right = -48.0
-offset_bottom = 709.0
-grow_horizontal = 0
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = -42.0
+offset_right = 101.0
+offset_bottom = -11.0
+grow_vertical = 0
 text = "New Game"
 
 [node name="HelpBtn" type="Button" parent="."]
 layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -43.0
-offset_top = 678.0
-offset_right = -8.0
-offset_bottom = 709.0
-grow_horizontal = 0
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 109.0
+offset_top = -42.0
+offset_right = 144.0
+offset_bottom = -11.0
+grow_vertical = 0
 text = "?"
+
+[node name="EndTurnBtn" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -108.0
+offset_top = -58.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "END TURN"
 
 [node name="HelpPanel" type="PanelContainer" parent="."]
 visible = false
@@ -259,13 +269,14 @@ text = "GOAL: Capture 25 tiles.
 
 Click a border tile to select it.
 Use sliders to assign units.
-Press END TURN to attack.
+Press END TURN to finish your turn and resolve combat.
 
-Tiles give resources each turn.
-Spend resources to build units.
+Tiles give resources each turn (on the turn they are occupied).
+Spend resources to train new units.
+You can (and after early game should) attack more than one tile per turn.
 
-Combat: stronger army wins.
-Losing side retreats at 50% casualties."
+Combat: stronger army wins, the bigger the gap in normalized strength the more decisive the win.
+Losing side retreats at 50% casualties max."
 horizontal_alignment = 1
 
 [node name="CloseHelpBtn" type="Button" parent="HelpPanel/VBox"]
@@ -337,15 +348,15 @@ size_flags_horizontal = 3
 
 [node name="PikeName" type="Label" parent="TrainingPanel/VBox/UnitsContainer/PikeRow/PikeInfo"]
 layout_mode = 2
-text = "PIKEMAN"
+text = "🗡 PIKEMAN"
 
 [node name="PikeCost" type="Label" parent="TrainingPanel/VBox/UnitsContainer/PikeRow/PikeInfo"]
 layout_mode = 2
-text = "Cost: M5 G2 S3  |  Power: 10"
+text = "Cost: ⛏5 ⚙2 🍞3  |  Power: 10"
 
 [node name="PikeRPS" type="Label" parent="TrainingPanel/VBox/UnitsContainer/PikeRow/PikeInfo"]
 layout_mode = 2
-text = "Strong vs: Cavalry  |  Weak vs: Archer"
+text = "Strong vs: 🐎  |  Weak vs: 🏹"
 
 [node name="PikeDesc" type="Label" parent="TrainingPanel/VBox/UnitsContainer/PikeRow/PikeInfo"]
 layout_mode = 2
@@ -379,15 +390,15 @@ size_flags_horizontal = 3
 
 [node name="CavName" type="Label" parent="TrainingPanel/VBox/UnitsContainer/CavRow/CavInfo"]
 layout_mode = 2
-text = "CAVALRY"
+text = "🐎 CAVALRY"
 
 [node name="CavCost" type="Label" parent="TrainingPanel/VBox/UnitsContainer/CavRow/CavInfo"]
 layout_mode = 2
-text = "Cost: M8 G5 S5  |  Power: 15"
+text = "Cost: ⛏8 ⚙5 🍞5  |  Power: 15"
 
 [node name="CavRPS" type="Label" parent="TrainingPanel/VBox/UnitsContainer/CavRow/CavInfo"]
 layout_mode = 2
-text = "Strong vs: Archer  |  Weak vs: Pikeman"
+text = "Strong vs: 🏹  |  Weak vs: 🗡"
 
 [node name="CavDesc" type="Label" parent="TrainingPanel/VBox/UnitsContainer/CavRow/CavInfo"]
 layout_mode = 2
@@ -421,15 +432,15 @@ size_flags_horizontal = 3
 
 [node name="ArcherName" type="Label" parent="TrainingPanel/VBox/UnitsContainer/ArcherRow/ArcherInfo"]
 layout_mode = 2
-text = "ARCHER"
+text = "🏹 ARCHER"
 
 [node name="ArcherCost" type="Label" parent="TrainingPanel/VBox/UnitsContainer/ArcherRow/ArcherInfo"]
 layout_mode = 2
-text = "Cost: M4 G4 S2  |  Power: 8"
+text = "Cost: ⛏4 ⚙4 🍞2  |  Power: 8"
 
 [node name="ArcherRPS" type="Label" parent="TrainingPanel/VBox/UnitsContainer/ArcherRow/ArcherInfo"]
 layout_mode = 2
-text = "Strong vs: Pikeman  |  Weak vs: Cavalry"
+text = "Strong vs: 🗡  |  Weak vs: 🐎"
 
 [node name="ArcherDesc" type="Label" parent="TrainingPanel/VBox/UnitsContainer/ArcherRow/ArcherInfo"]
 layout_mode = 2

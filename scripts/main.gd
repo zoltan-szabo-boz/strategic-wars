@@ -90,10 +90,10 @@ const TILE_COLORS := {
 }
 
 const RESOURCE_ICONS := {
-	Config.ResourceType.MANPOWER: "M",
-	Config.ResourceType.GOODS: "G",
-	Config.ResourceType.SUPPLIES: "S",
-	Config.ResourceType.ALL: "*",
+	Config.ResourceType.MANPOWER: "⛏",
+	Config.ResourceType.GOODS: "⚙",
+	Config.ResourceType.SUPPLIES: "🍞",
+	Config.ResourceType.ALL: "⭐",
 }
 
 # =============================================================================
@@ -157,7 +157,7 @@ func _get_node_references() -> void:
 	archer_slider = get_node_or_null("GameContainer/LeftPanel/AssignPanel/ArcherRow/ArcherSlider")
 	archer_label = get_node_or_null("GameContainer/LeftPanel/AssignPanel/ArcherRow/ArcherLabel")
 
-	end_turn_btn = get_node_or_null("GameContainer/LeftPanel/EndTurnBtn")
+	end_turn_btn = get_node_or_null("EndTurnBtn")
 
 	victory_panel = get_node_or_null("VictoryPanel")
 	victory_label = get_node_or_null("VictoryPanel/VictoryLabel")
@@ -307,11 +307,11 @@ func _update_tile_button(x: int, y: int) -> void:
 		else:
 			btn.text = "%s%d" % [icon, tile.production]
 	else:
-		btn.text = "%s%d\nD:%d" % [icon, tile.production, tile.defense]
+		btn.text = "%s%d\n🛡%d" % [icon, tile.production, tile.defense]
 
 	# Show assignment indicator if units assigned
 	if GameState.has_assignment(Vector2i(x, y)):
-		btn.text += "\n!"
+		btn.text += "\n⚔"
 
 # =============================================================================
 # UI REFRESH
@@ -327,9 +327,9 @@ func _refresh_all() -> void:
 
 func _refresh_resources() -> void:
 	var income := _calculate_income()
-	manpower_label.text = "Manpower: %d (+%d)" % [GameState.get_resource("manpower"), income["manpower"]]
-	goods_label.text = "Goods: %d (+%d)" % [GameState.get_resource("goods"), income["goods"]]
-	supplies_label.text = "Supplies: %d (+%d)" % [GameState.get_resource("supplies"), income["supplies"]]
+	manpower_label.text = "⛏ Manpower: %d (+%d)" % [GameState.get_resource("manpower"), income["manpower"]]
+	goods_label.text = "⚙ Goods: %d (+%d)" % [GameState.get_resource("goods"), income["goods"]]
+	supplies_label.text = "🍞 Supplies: %d (+%d)" % [GameState.get_resource("supplies"), income["supplies"]]
 
 func _calculate_income() -> Dictionary:
 	var income := {"manpower": 0, "goods": 0, "supplies": 0}
@@ -352,9 +352,9 @@ func _calculate_income() -> Dictionary:
 
 func _refresh_army() -> void:
 	var available := GameState.get_available_army()
-	pikemen_label.text = "Pikemen: %d (%d)" % [available["pikemen"], GameState.army["pikemen"]]
-	cavalry_label.text = "Cavalry: %d (%d)" % [available["cavalry"], GameState.army["cavalry"]]
-	archers_label.text = "Archers: %d (%d)" % [available["archers"], GameState.army["archers"]]
+	pikemen_label.text = "🗡 Pikemen: %d (%d)" % [available["pikemen"], GameState.army["pikemen"]]
+	cavalry_label.text = "🐎 Cavalry: %d (%d)" % [available["cavalry"], GameState.army["cavalry"]]
+	archers_label.text = "🏹 Archers: %d (%d)" % [available["archers"], GameState.army["archers"]]
 
 func _refresh_turn_info() -> void:
 	turn_label.text = "Turn: %d" % GameState.turn_number
@@ -487,11 +487,11 @@ func _refresh_training_panel() -> void:
 	var remaining_supplies: int = current_supplies - int(draft_cost["supplies"])
 
 	if manpower_draft_label:
-		manpower_draft_label.text = "Manpower: %d" % remaining_manpower
+		manpower_draft_label.text = "⛏ %d" % remaining_manpower
 	if goods_draft_label:
-		goods_draft_label.text = "Goods: %d" % remaining_goods
+		goods_draft_label.text = "⚙ %d" % remaining_goods
 	if supplies_draft_label:
-		supplies_draft_label.text = "Supplies: %d" % remaining_supplies
+		supplies_draft_label.text = "🍞 %d" % remaining_supplies
 
 	# Update unit counts
 	if pike_count_label:
@@ -650,18 +650,18 @@ func _show_turn_report() -> void:
 				combat_text += "  Casualties: "
 				var parts: Array = []
 				if casualties["pikemen"] > 0:
-					parts.append("%d Pike" % casualties["pikemen"])
+					parts.append("🗡%d" % casualties["pikemen"])
 				if casualties["cavalry"] > 0:
-					parts.append("%d Cav" % casualties["cavalry"])
+					parts.append("🐎%d" % casualties["cavalry"])
 				if casualties["archers"] > 0:
-					parts.append("%d Arch" % casualties["archers"])
+					parts.append("🏹%d" % casualties["archers"])
 				combat_text += ", ".join(parts) + "\n"
 			else:
 				combat_text += "  Casualties: None\n"
 			combat_text += "\n"
 
 	# Format income report
-	var income_text := "Manpower: +%d\nGoods: +%d\nSupplies: +%d" % [
+	var income_text := "⛏ Manpower: +%d\n⚙ Goods: +%d\n🍞 Supplies: +%d" % [
 		turn_income["manpower"],
 		turn_income["goods"],
 		turn_income["supplies"]
