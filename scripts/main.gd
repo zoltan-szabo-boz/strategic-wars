@@ -55,14 +55,14 @@ var close_report_btn: Button
 var turn_combat_results: Array = []  # Array of combat result dictionaries
 var turn_income: Dictionary = {"manpower": 0, "goods": 0, "supplies": 0}
 
-# Assignment panel
-var assign_panel: VBoxContainer
+# Assignment panel (floating tooltip)
+var assign_panel: PanelContainer
 var pike_slider: HSlider
-var pike_label: Label
+var pike_label: RichTextLabel
 var cav_slider: HSlider
-var cav_label: Label
+var cav_label: RichTextLabel
 var archer_slider: HSlider
-var archer_label: Label
+var archer_label: RichTextLabel
 
 # End turn
 var end_turn_btn: Button
@@ -106,13 +106,13 @@ func _load_icon_textures() -> void:
 	ICON_SWORDS = load("res://assets/icons/swords.svg")
 
 # Icon BBCode helpers
-const ICON_PICKAXE := "[img=14]res://assets/icons/pickaxe.svg[/img]"
-const ICON_GEAR := "[img=14]res://assets/icons/gear.svg[/img]"
-const ICON_BREAD := "[img=14]res://assets/icons/bread.svg[/img]"
-const ICON_DAGGER := "[img=14]res://assets/icons/dagger.svg[/img]"
-const ICON_HORSE := "[img=14]res://assets/icons/horse.svg[/img]"
-const ICON_BOW := "[img=14]res://assets/icons/bow.svg[/img]"
-const ICON_BLUE := "[img=14]res://assets/icons/blue_circle.svg[/img]"
+const ICON_PICKAXE := "[img=30]res://assets/icons/pickaxe.svg[/img]"
+const ICON_GEAR := "[img=30]res://assets/icons/gear.svg[/img]"
+const ICON_BREAD := "[img=30]res://assets/icons/bread.svg[/img]"
+const ICON_DAGGER := "[img=30]res://assets/icons/dagger.svg[/img]"
+const ICON_HORSE := "[img=30]res://assets/icons/horse.svg[/img]"
+const ICON_BOW := "[img=30]res://assets/icons/bow.svg[/img]"
+const ICON_BLUE := "[img=30]res://assets/icons/blue_circle.svg[/img]"
 const ICON_RED := "[img=14]res://assets/icons/red_circle.svg[/img]"
 
 # Helper to set BBCode text on RichTextLabel
@@ -224,13 +224,13 @@ func _get_node_references() -> void:
 	income_report_label = get_node_or_null("TurnReportPanel/VBox/ScrollContainer/ReportContent/IncomeReport")
 	close_report_btn = get_node_or_null("TurnReportPanel/VBox/CloseReportBtn")
 
-	assign_panel = get_node_or_null("GameContainer/LeftPanel/AssignPanel")
-	pike_slider = get_node_or_null("GameContainer/LeftPanel/AssignPanel/PikeRow/PikeSlider")
-	pike_label = get_node_or_null("GameContainer/LeftPanel/AssignPanel/PikeRow/PikeLabel")
-	cav_slider = get_node_or_null("GameContainer/LeftPanel/AssignPanel/CavRow/CavSlider")
-	cav_label = get_node_or_null("GameContainer/LeftPanel/AssignPanel/CavRow/CavLabel")
-	archer_slider = get_node_or_null("GameContainer/LeftPanel/AssignPanel/ArcherRow/ArcherSlider")
-	archer_label = get_node_or_null("GameContainer/LeftPanel/AssignPanel/ArcherRow/ArcherLabel")
+	assign_panel = get_node_or_null("AssignPanel")
+	pike_slider = get_node_or_null("AssignPanel/VBox/PikeRow/PikeSlider")
+	pike_label = get_node_or_null("AssignPanel/VBox/PikeRow/PikeLabel")
+	cav_slider = get_node_or_null("AssignPanel/VBox/CavRow/CavSlider")
+	cav_label = get_node_or_null("AssignPanel/VBox/CavRow/CavLabel")
+	archer_slider = get_node_or_null("AssignPanel/VBox/ArcherRow/ArcherSlider")
+	archer_label = get_node_or_null("AssignPanel/VBox/ArcherRow/ArcherLabel")
 
 	end_turn_btn = get_node_or_null("EndTurnBtn")
 
@@ -346,7 +346,7 @@ func _create_map_buttons() -> void:
 
 			var res_icon := TextureRect.new()
 			res_icon.name = "ResIcon"
-			res_icon.custom_minimum_size = Vector2(16, 16)
+			res_icon.custom_minimum_size = Vector2(30, 30)
 			res_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			res_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 			res_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -367,7 +367,7 @@ func _create_map_buttons() -> void:
 
 			var def_icon := TextureRect.new()
 			def_icon.name = "DefIcon"
-			def_icon.custom_minimum_size = Vector2(12, 12)
+			def_icon.custom_minimum_size = Vector2(24, 24)
 			def_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			def_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 			def_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -378,16 +378,16 @@ func _create_map_buttons() -> void:
 			def_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			def_row.add_child(def_label)
 
-			# Assignment indicator (swords icon)
+			# Assignment indicator (swords icon) - overlay on entire tile
 			var assign_icon := TextureRect.new()
 			assign_icon.name = "AssignIcon"
-			assign_icon.custom_minimum_size = Vector2(14, 14)
+			assign_icon.set_anchors_preset(Control.PRESET_FULL_RECT)
 			assign_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			assign_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 			assign_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			assign_icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+			assign_icon.modulate = Color(1, 1, 1, 0.7)  # Semi-transparent
 			assign_icon.visible = false
-			vbox.add_child(assign_icon)
+			btn.add_child(assign_icon)
 
 			map_container.add_child(btn)
 			row.append(btn)
@@ -448,7 +448,7 @@ func _update_tile_button(x: int, y: int) -> void:
 	var def_row: HBoxContainer = vbox.get_node("DefRow")
 	var def_icon: TextureRect = vbox.get_node("DefRow/DefIcon")
 	var def_label: Label = vbox.get_node("DefRow/DefLabel")
-	var assign_icon: TextureRect = vbox.get_node("AssignIcon")
+	var assign_icon: TextureRect = btn.get_node("AssignIcon")
 
 	# Set resource icon and production
 	var icon_texture: Texture2D = RESOURCE_ICON_TEXTURES.get(tile.resource_type)
@@ -579,6 +579,37 @@ func _get_resource_name(res_type: int) -> String:
 	return "Unknown"
 
 
+func _position_assign_panel(coord: Vector2i) -> void:
+	if not assign_panel or not map_container:
+		return
+
+	# Get the tile button position
+	var btn: Button = tile_buttons[coord.y][coord.x]
+	var btn_global_pos := btn.global_position
+	var btn_size := btn.size
+
+	# Position panel to the right of the tile, or left if not enough space
+	var panel_size := assign_panel.size
+	var screen_size := get_viewport_rect().size
+
+	var target_pos := Vector2.ZERO
+
+	# Try to position to the right of the tile
+	target_pos.x = btn_global_pos.x + btn_size.x + 10
+
+	# If it would go off screen, position to the left
+	if target_pos.x + panel_size.x > screen_size.x:
+		target_pos.x = btn_global_pos.x - panel_size.x - 10
+
+	# Vertically center on the tile
+	target_pos.y = btn_global_pos.y + (btn_size.y / 2) - (panel_size.y / 2)
+
+	# Clamp to screen bounds
+	target_pos.y = clamp(target_pos.y, 10, screen_size.y - panel_size.y - 10)
+	target_pos.x = clamp(target_pos.x, 10, screen_size.x - panel_size.x - 10)
+
+	assign_panel.global_position = target_pos
+
 func _refresh_assign_panel() -> void:
 	var coord := GameState.selected_tile
 	if coord == Vector2i(-1, -1) or not GameState.is_border_tile(coord.x, coord.y):
@@ -588,6 +619,8 @@ func _refresh_assign_panel() -> void:
 
 	if assign_panel:
 		assign_panel.show()
+		# Position the panel near the clicked tile
+		_position_assign_panel(coord)
 
 	var assigned := GameState.get_assignment(coord)
 	var total_army := GameState.army  # Total army (not available)
@@ -602,7 +635,7 @@ func _refresh_assign_panel() -> void:
 		pike_slider.value = assigned["pikemen"]
 		pike_slider.set_block_signals(false)
 	if pike_label:
-		pike_label.text = "Pike: %d" % int(assigned["pikemen"])
+		_set_bbcode(pike_label, "%s %d" % [ICON_DAGGER, int(assigned["pikemen"])])
 
 	if cav_slider:
 		cav_slider.set_block_signals(true)
@@ -610,7 +643,7 @@ func _refresh_assign_panel() -> void:
 		cav_slider.value = assigned["cavalry"]
 		cav_slider.set_block_signals(false)
 	if cav_label:
-		cav_label.text = "Cav: %d" % int(assigned["cavalry"])
+		_set_bbcode(cav_label, "%s %d" % [ICON_HORSE, int(assigned["cavalry"])])
 
 	if archer_slider:
 		archer_slider.set_block_signals(true)
@@ -618,7 +651,7 @@ func _refresh_assign_panel() -> void:
 		archer_slider.value = assigned["archers"]
 		archer_slider.set_block_signals(false)
 	if archer_label:
-		archer_label.text = "Arch: %d" % int(assigned["archers"])
+		_set_bbcode(archer_label, "%s %d" % [ICON_BOW, int(assigned["archers"])])
 
 # =============================================================================
 # INPUT HANDLERS
@@ -782,6 +815,8 @@ func _set_assignment(unit_key: String, new_count: int) -> void:
 	# Update label and army display without full refresh (to avoid slider feedback)
 	_refresh_army()
 	_refresh_assign_panel()
+	# Update the tile to show/hide assignment icon immediately
+	_update_tile_button(coord.x, coord.y)
 
 func _on_help_pressed() -> void:
 	if help_panel:

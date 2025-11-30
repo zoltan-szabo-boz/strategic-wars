@@ -52,62 +52,6 @@ custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 text = "TRAIN UNITS"
 
-[node name="Separator1" type="HSeparator" parent="GameContainer/LeftPanel"]
-layout_mode = 2
-
-[node name="AssignLabel" type="Label" parent="GameContainer/LeftPanel"]
-layout_mode = 2
-text = "ASSIGN TO BORDER"
-
-[node name="AssignPanel" type="VBoxContainer" parent="GameContainer/LeftPanel"]
-visible = false
-layout_mode = 2
-
-[node name="PikeRow" type="HBoxContainer" parent="GameContainer/LeftPanel/AssignPanel"]
-layout_mode = 2
-
-[node name="PikeLabel" type="Label" parent="GameContainer/LeftPanel/AssignPanel/PikeRow"]
-custom_minimum_size = Vector2(50, 0)
-layout_mode = 2
-text = "Pike: 0"
-
-[node name="PikeSlider" type="HSlider" parent="GameContainer/LeftPanel/AssignPanel/PikeRow"]
-custom_minimum_size = Vector2(100, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-max_value = 0.0
-
-[node name="CavRow" type="HBoxContainer" parent="GameContainer/LeftPanel/AssignPanel"]
-layout_mode = 2
-
-[node name="CavLabel" type="Label" parent="GameContainer/LeftPanel/AssignPanel/CavRow"]
-custom_minimum_size = Vector2(50, 0)
-layout_mode = 2
-text = "Cav: 0"
-
-[node name="CavSlider" type="HSlider" parent="GameContainer/LeftPanel/AssignPanel/CavRow"]
-custom_minimum_size = Vector2(100, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-max_value = 0.0
-
-[node name="ArcherRow" type="HBoxContainer" parent="GameContainer/LeftPanel/AssignPanel"]
-layout_mode = 2
-
-[node name="ArcherLabel" type="Label" parent="GameContainer/LeftPanel/AssignPanel/ArcherRow"]
-custom_minimum_size = Vector2(50, 0)
-layout_mode = 2
-text = "Arch: 0"
-
-[node name="ArcherSlider" type="HSlider" parent="GameContainer/LeftPanel/AssignPanel/ArcherRow"]
-custom_minimum_size = Vector2(100, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-max_value = 0.0
-
-[node name="Separator2" type="HSeparator" parent="GameContainer/LeftPanel"]
-layout_mode = 2
-
 [node name="Spacer" type="Control" parent="GameContainer/LeftPanel"]
 layout_mode = 2
 size_flags_vertical = 3
@@ -202,7 +146,6 @@ layout_mode = 2
 text = "Turn: 1"
 
 [node name="VictoryPanel" type="PanelContainer" parent="."]
-visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -302,7 +245,6 @@ layout_mode = 2
 text = "Close"
 
 [node name="TrainingPanel" type="PanelContainer" parent="."]
-visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -400,6 +342,7 @@ text = "Balanced defensive unit"
 
 [node name="PikeControls" type="HBoxContainer" parent="TrainingPanel/VBox/UnitsContainer/PikeRow"]
 layout_mode = 2
+size_flags_vertical = 4
 
 [node name="PikeMinus" type="Button" parent="TrainingPanel/VBox/UnitsContainer/PikeRow/PikeControls"]
 custom_minimum_size = Vector2(30, 30)
@@ -448,6 +391,7 @@ text = "Powerful but expensive"
 
 [node name="CavControls" type="HBoxContainer" parent="TrainingPanel/VBox/UnitsContainer/CavRow"]
 layout_mode = 2
+size_flags_vertical = 4
 
 [node name="CavMinus" type="Button" parent="TrainingPanel/VBox/UnitsContainer/CavRow/CavControls"]
 custom_minimum_size = Vector2(30, 30)
@@ -496,6 +440,7 @@ text = "Cheapest supplies cost"
 
 [node name="ArcherControls" type="HBoxContainer" parent="TrainingPanel/VBox/UnitsContainer/ArcherRow"]
 layout_mode = 2
+size_flags_vertical = 4
 
 [node name="ArcherMinus" type="Button" parent="TrainingPanel/VBox/UnitsContainer/ArcherRow/ArcherControls"]
 custom_minimum_size = Vector2(30, 30)
@@ -601,3 +546,66 @@ custom_minimum_size = Vector2(100, 35)
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Continue"
+
+[node name="AssignPanel" type="PanelContainer" parent="."]
+visible = false
+layout_mode = 0
+offset_right = 180.0
+offset_bottom = 120.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_training")
+
+[node name="VBox" type="VBoxContainer" parent="AssignPanel"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="AssignPanel/VBox"]
+layout_mode = 2
+text = "ASSIGN UNITS"
+horizontal_alignment = 1
+
+[node name="PikeRow" type="HBoxContainer" parent="AssignPanel/VBox"]
+layout_mode = 2
+
+[node name="PikeLabel" type="RichTextLabel" parent="AssignPanel/VBox/PikeRow"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+bbcode_enabled = true
+text = "Pike: 0"
+fit_content = true
+
+[node name="PikeSlider" type="HSlider" parent="AssignPanel/VBox/PikeRow"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 0.0
+
+[node name="CavRow" type="HBoxContainer" parent="AssignPanel/VBox"]
+layout_mode = 2
+
+[node name="CavLabel" type="RichTextLabel" parent="AssignPanel/VBox/CavRow"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+bbcode_enabled = true
+text = "Cav: 0"
+fit_content = true
+
+[node name="CavSlider" type="HSlider" parent="AssignPanel/VBox/CavRow"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 0.0
+
+[node name="ArcherRow" type="HBoxContainer" parent="AssignPanel/VBox"]
+layout_mode = 2
+
+[node name="ArcherLabel" type="RichTextLabel" parent="AssignPanel/VBox/ArcherRow"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+bbcode_enabled = true
+text = "Arch: 0"
+fit_content = true
+
+[node name="ArcherSlider" type="HSlider" parent="AssignPanel/VBox/ArcherRow"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 0.0
