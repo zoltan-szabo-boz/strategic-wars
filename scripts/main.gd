@@ -127,8 +127,58 @@ func _set_bbcode(label: RichTextLabel, bbcode: String) -> void:
 func _ready() -> void:
 	_load_icon_textures()
 	_get_node_references()
+	_init_static_bbcode_labels()
 	_connect_signals()
 	_start_new_game()
+
+func _init_static_bbcode_labels() -> void:
+	# Training panel - unit info labels need BBCode re-parsed at runtime
+	var pike_name := get_node_or_null("TrainingPanel/VBox/UnitsContainer/PikeRow/PikeInfo/PikeName") as RichTextLabel
+	var pike_cost := get_node_or_null("TrainingPanel/VBox/UnitsContainer/PikeRow/PikeInfo/PikeCost") as RichTextLabel
+	var pike_rps := get_node_or_null("TrainingPanel/VBox/UnitsContainer/PikeRow/PikeInfo/PikeRPS") as RichTextLabel
+	var cav_name := get_node_or_null("TrainingPanel/VBox/UnitsContainer/CavRow/CavInfo/CavName") as RichTextLabel
+	var cav_cost := get_node_or_null("TrainingPanel/VBox/UnitsContainer/CavRow/CavInfo/CavCost") as RichTextLabel
+	var cav_rps := get_node_or_null("TrainingPanel/VBox/UnitsContainer/CavRow/CavInfo/CavRPS") as RichTextLabel
+	var archer_name := get_node_or_null("TrainingPanel/VBox/UnitsContainer/ArcherRow/ArcherInfo/ArcherName") as RichTextLabel
+	var archer_cost := get_node_or_null("TrainingPanel/VBox/UnitsContainer/ArcherRow/ArcherInfo/ArcherCost") as RichTextLabel
+	var archer_rps := get_node_or_null("TrainingPanel/VBox/UnitsContainer/ArcherRow/ArcherInfo/ArcherRPS") as RichTextLabel
+
+	# Help panel
+	var help_label := get_node_or_null("HelpPanel/VBox/HelpLabel") as RichTextLabel
+
+	# Set BBCode content for training panel
+	if pike_name:
+		_set_bbcode(pike_name, "%s PIKEMAN" % ICON_DAGGER)
+	if pike_cost:
+		_set_bbcode(pike_cost, "Cost: %s5 %s2 %s3  |  Power: 10" % [ICON_PICKAXE, ICON_GEAR, ICON_BREAD])
+	if pike_rps:
+		_set_bbcode(pike_rps, "Strong vs: %s  |  Weak vs: %s" % [ICON_HORSE, ICON_BOW])
+
+	if cav_name:
+		_set_bbcode(cav_name, "%s CAVALRY" % ICON_HORSE)
+	if cav_cost:
+		_set_bbcode(cav_cost, "Cost: %s8 %s5 %s5  |  Power: 15" % [ICON_PICKAXE, ICON_GEAR, ICON_BREAD])
+	if cav_rps:
+		_set_bbcode(cav_rps, "Strong vs: %s  |  Weak vs: %s" % [ICON_BOW, ICON_DAGGER])
+
+	if archer_name:
+		_set_bbcode(archer_name, "%s ARCHER" % ICON_BOW)
+	if archer_cost:
+		_set_bbcode(archer_cost, "Cost: %s4 %s4 %s2  |  Power: 8" % [ICON_PICKAXE, ICON_GEAR, ICON_BREAD])
+	if archer_rps:
+		_set_bbcode(archer_rps, "Strong vs: %s  |  Weak vs: %s" % [ICON_DAGGER, ICON_HORSE])
+
+	# Help panel
+	if help_label:
+		_set_bbcode(help_label, "[center]GOAL: Eliminate the enemy (%s red)!\n\nClick a border tile to select it.\nUse sliders to assign units.\nPress END TURN to finish your turn and resolve combat.\n\nTiles give resources each turn.\nSpend resources to train new units.\nYou can attack multiple tiles per turn.\n\nCombat: stronger army wins.\nThe enemy AI also expands and attacks![/center]" % ICON_RED)
+
+	# Initialize draft resource labels (they get updated in _update_training_display but need initial setup)
+	if manpower_draft_label:
+		_set_bbcode(manpower_draft_label, "%s %d" % [ICON_PICKAXE, GameState.get_resource("manpower")])
+	if goods_draft_label:
+		_set_bbcode(goods_draft_label, "%s %d" % [ICON_GEAR, GameState.get_resource("goods")])
+	if supplies_draft_label:
+		_set_bbcode(supplies_draft_label, "%s %d" % [ICON_BREAD, GameState.get_resource("supplies")])
 
 func _get_node_references() -> void:
 	# Use get_node_or_null to avoid crashes if nodes don't exist

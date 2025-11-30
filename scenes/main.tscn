@@ -333,28 +333,34 @@ layout_mode = 2
 alignment = 1
 
 [node name="ManpowerDraft" type="RichTextLabel" parent="TrainingPanel/VBox/ResourcesPanel/ResourcesHBox"]
+custom_minimum_size = Vector2(80, 24)
 layout_mode = 2
 bbcode_enabled = true
 text = "Manpower: 30"
 fit_content = true
+scroll_active = false
 
 [node name="Sep1" type="VSeparator" parent="TrainingPanel/VBox/ResourcesPanel/ResourcesHBox"]
 layout_mode = 2
 
 [node name="GoodsDraft" type="RichTextLabel" parent="TrainingPanel/VBox/ResourcesPanel/ResourcesHBox"]
+custom_minimum_size = Vector2(80, 24)
 layout_mode = 2
 bbcode_enabled = true
 text = "Goods: 20"
 fit_content = true
+scroll_active = false
 
 [node name="Sep2" type="VSeparator" parent="TrainingPanel/VBox/ResourcesPanel/ResourcesHBox"]
 layout_mode = 2
 
 [node name="SuppliesDraft" type="RichTextLabel" parent="TrainingPanel/VBox/ResourcesPanel/ResourcesHBox"]
+custom_minimum_size = Vector2(80, 24)
 layout_mode = 2
 bbcode_enabled = true
 text = "Supplies: 25"
 fit_content = true
+scroll_active = false
 
 [node name="Separator" type="HSeparator" parent="TrainingPanel/VBox"]
 layout_mode = 2
