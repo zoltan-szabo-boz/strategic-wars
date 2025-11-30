@@ -128,13 +128,11 @@ custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 
-[node name="TurnLabel" type="Label" parent="GameContainer/RightPanel"]
+[node name="TilesLabel" type="RichTextLabel" parent="GameContainer/RightPanel"]
 layout_mode = 2
-text = "Turn: 1"
-
-[node name="TilesLabel" type="Label" parent="GameContainer/RightPanel"]
-layout_mode = 2
+bbcode_enabled = true
 text = "Tiles: 1/25"
+fit_content = true
 
 [node name="Separator3" type="HSeparator" parent="GameContainer/RightPanel"]
 layout_mode = 2
@@ -143,17 +141,23 @@ layout_mode = 2
 layout_mode = 2
 text = "RESOURCES"
 
-[node name="ManpowerLabel" type="Label" parent="GameContainer/RightPanel"]
+[node name="ManpowerLabel" type="RichTextLabel" parent="GameContainer/RightPanel"]
 layout_mode = 2
+bbcode_enabled = true
 text = "Manpower: 30"
+fit_content = true
 
-[node name="GoodsLabel" type="Label" parent="GameContainer/RightPanel"]
+[node name="GoodsLabel" type="RichTextLabel" parent="GameContainer/RightPanel"]
 layout_mode = 2
+bbcode_enabled = true
 text = "Goods: 20"
+fit_content = true
 
-[node name="SuppliesLabel" type="Label" parent="GameContainer/RightPanel"]
+[node name="SuppliesLabel" type="RichTextLabel" parent="GameContainer/RightPanel"]
 layout_mode = 2
+bbcode_enabled = true
 text = "Supplies: 25"
+fit_content = true
 
 [node name="Separator4" type="HSeparator" parent="GameContainer/RightPanel"]
 layout_mode = 2
@@ -162,17 +166,23 @@ layout_mode = 2
 layout_mode = 2
 text = "ARMY (avail/total)"
 
-[node name="PikemenLabel" type="Label" parent="GameContainer/RightPanel"]
+[node name="PikemenLabel" type="RichTextLabel" parent="GameContainer/RightPanel"]
 layout_mode = 2
+bbcode_enabled = true
 text = "Pikemen: 2 (2)"
+fit_content = true
 
-[node name="CavalryLabel" type="Label" parent="GameContainer/RightPanel"]
+[node name="CavalryLabel" type="RichTextLabel" parent="GameContainer/RightPanel"]
 layout_mode = 2
+bbcode_enabled = true
 text = "Cavalry: 1 (1)"
+fit_content = true
 
-[node name="ArchersLabel" type="Label" parent="GameContainer/RightPanel"]
+[node name="ArchersLabel" type="RichTextLabel" parent="GameContainer/RightPanel"]
 layout_mode = 2
+bbcode_enabled = true
 text = "Archers: 2 (2)"
+fit_content = true
 
 [node name="Separator5" type="HSeparator" parent="GameContainer/RightPanel"]
 layout_mode = 2
@@ -183,8 +193,13 @@ size_flags_vertical = 3
 
 [node name="TileInfoLabel" type="Label" parent="GameContainer/RightPanel/TileInfoPanel"]
 layout_mode = 2
+size_flags_horizontal = 4
 text = "Click a tile to select"
 vertical_alignment = 1
+
+[node name="TurnLabel" type="Label" parent="GameContainer/RightPanel"]
+layout_mode = 2
+text = "Turn: 1"
 
 [node name="VictoryPanel" type="PanelContainer" parent="."]
 visible = false
@@ -265,9 +280,10 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_training")
 [node name="VBox" type="VBoxContainer" parent="HelpPanel"]
 layout_mode = 2
 
-[node name="HelpLabel" type="Label" parent="HelpPanel/VBox"]
+[node name="HelpLabel" type="RichTextLabel" parent="HelpPanel/VBox"]
 layout_mode = 2
-text = "GOAL: Eliminate the enemy (🔴 red)!
+bbcode_enabled = true
+text = "[center]GOAL: Eliminate the enemy ([img=16]res://assets/icons/red_circle.svg[/img] red)!
 
 Click a border tile to select it.
 Use sliders to assign units.
@@ -278,8 +294,8 @@ Spend resources to train new units.
 You can attack multiple tiles per turn.
 
 Combat: stronger army wins.
-The enemy AI also expands and attacks!"
-horizontal_alignment = 1
+The enemy AI also expands and attacks![/center]"
+fit_content = true
 
 [node name="CloseHelpBtn" type="Button" parent="HelpPanel/VBox"]
 layout_mode = 2
@@ -316,23 +332,29 @@ layout_mode = 2
 layout_mode = 2
 alignment = 1
 
-[node name="ManpowerDraft" type="Label" parent="TrainingPanel/VBox/ResourcesPanel/ResourcesHBox"]
+[node name="ManpowerDraft" type="RichTextLabel" parent="TrainingPanel/VBox/ResourcesPanel/ResourcesHBox"]
 layout_mode = 2
+bbcode_enabled = true
 text = "Manpower: 30"
+fit_content = true
 
 [node name="Sep1" type="VSeparator" parent="TrainingPanel/VBox/ResourcesPanel/ResourcesHBox"]
 layout_mode = 2
 
-[node name="GoodsDraft" type="Label" parent="TrainingPanel/VBox/ResourcesPanel/ResourcesHBox"]
+[node name="GoodsDraft" type="RichTextLabel" parent="TrainingPanel/VBox/ResourcesPanel/ResourcesHBox"]
 layout_mode = 2
+bbcode_enabled = true
 text = "Goods: 20"
+fit_content = true
 
 [node name="Sep2" type="VSeparator" parent="TrainingPanel/VBox/ResourcesPanel/ResourcesHBox"]
 layout_mode = 2
 
-[node name="SuppliesDraft" type="Label" parent="TrainingPanel/VBox/ResourcesPanel/ResourcesHBox"]
+[node name="SuppliesDraft" type="RichTextLabel" parent="TrainingPanel/VBox/ResourcesPanel/ResourcesHBox"]
 layout_mode = 2
+bbcode_enabled = true
 text = "Supplies: 25"
+fit_content = true
 
 [node name="Separator" type="HSeparator" parent="TrainingPanel/VBox"]
 layout_mode = 2
@@ -348,17 +370,23 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="PikeName" type="Label" parent="TrainingPanel/VBox/UnitsContainer/PikeRow/PikeInfo"]
+[node name="PikeName" type="RichTextLabel" parent="TrainingPanel/VBox/UnitsContainer/PikeRow/PikeInfo"]
 layout_mode = 2
-text = "🗡 PIKEMAN"
+bbcode_enabled = true
+text = "[img=16]res://assets/icons/dagger.svg[/img] PIKEMAN"
+fit_content = true
 
-[node name="PikeCost" type="Label" parent="TrainingPanel/VBox/UnitsContainer/PikeRow/PikeInfo"]
+[node name="PikeCost" type="RichTextLabel" parent="TrainingPanel/VBox/UnitsContainer/PikeRow/PikeInfo"]
 layout_mode = 2
-text = "Cost: ⛏5 ⚙2 🍞3  |  Power: 10"
+bbcode_enabled = true
+text = "Cost: [img=14]res://assets/icons/pickaxe.svg[/img]5 [img=14]res://assets/icons/gear.svg[/img]2 [img=14]res://assets/icons/bread.svg[/img]3  |  Power: 10"
+fit_content = true
 
-[node name="PikeRPS" type="Label" parent="TrainingPanel/VBox/UnitsContainer/PikeRow/PikeInfo"]
+[node name="PikeRPS" type="RichTextLabel" parent="TrainingPanel/VBox/UnitsContainer/PikeRow/PikeInfo"]
 layout_mode = 2
-text = "Strong vs: 🐎  |  Weak vs: 🏹"
+bbcode_enabled = true
+text = "Strong vs: [img=14]res://assets/icons/horse.svg[/img]  |  Weak vs: [img=14]res://assets/icons/bow.svg[/img]"
+fit_content = true
 
 [node name="PikeDesc" type="Label" parent="TrainingPanel/VBox/UnitsContainer/PikeRow/PikeInfo"]
 layout_mode = 2
@@ -390,17 +418,23 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="CavName" type="Label" parent="TrainingPanel/VBox/UnitsContainer/CavRow/CavInfo"]
+[node name="CavName" type="RichTextLabel" parent="TrainingPanel/VBox/UnitsContainer/CavRow/CavInfo"]
 layout_mode = 2
-text = "🐎 CAVALRY"
+bbcode_enabled = true
+text = "[img=16]res://assets/icons/horse.svg[/img] CAVALRY"
+fit_content = true
 
-[node name="CavCost" type="Label" parent="TrainingPanel/VBox/UnitsContainer/CavRow/CavInfo"]
+[node name="CavCost" type="RichTextLabel" parent="TrainingPanel/VBox/UnitsContainer/CavRow/CavInfo"]
 layout_mode = 2
-text = "Cost: ⛏8 ⚙5 🍞5  |  Power: 15"
+bbcode_enabled = true
+text = "Cost: [img=14]res://assets/icons/pickaxe.svg[/img]8 [img=14]res://assets/icons/gear.svg[/img]5 [img=14]res://assets/icons/bread.svg[/img]5  |  Power: 15"
+fit_content = true
 
-[node name="CavRPS" type="Label" parent="TrainingPanel/VBox/UnitsContainer/CavRow/CavInfo"]
+[node name="CavRPS" type="RichTextLabel" parent="TrainingPanel/VBox/UnitsContainer/CavRow/CavInfo"]
 layout_mode = 2
-text = "Strong vs: 🏹  |  Weak vs: 🗡"
+bbcode_enabled = true
+text = "Strong vs: [img=14]res://assets/icons/bow.svg[/img]  |  Weak vs: [img=14]res://assets/icons/dagger.svg[/img]"
+fit_content = true
 
 [node name="CavDesc" type="Label" parent="TrainingPanel/VBox/UnitsContainer/CavRow/CavInfo"]
 layout_mode = 2
@@ -432,17 +466,23 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="ArcherName" type="Label" parent="TrainingPanel/VBox/UnitsContainer/ArcherRow/ArcherInfo"]
+[node name="ArcherName" type="RichTextLabel" parent="TrainingPanel/VBox/UnitsContainer/ArcherRow/ArcherInfo"]
 layout_mode = 2
-text = "🏹 ARCHER"
+bbcode_enabled = true
+text = "[img=16]res://assets/icons/bow.svg[/img] ARCHER"
+fit_content = true
 
-[node name="ArcherCost" type="Label" parent="TrainingPanel/VBox/UnitsContainer/ArcherRow/ArcherInfo"]
+[node name="ArcherCost" type="RichTextLabel" parent="TrainingPanel/VBox/UnitsContainer/ArcherRow/ArcherInfo"]
 layout_mode = 2
-text = "Cost: ⛏4 ⚙4 🍞2  |  Power: 8"
+bbcode_enabled = true
+text = "Cost: [img=14]res://assets/icons/pickaxe.svg[/img]4 [img=14]res://assets/icons/gear.svg[/img]4 [img=14]res://assets/icons/bread.svg[/img]2  |  Power: 8"
+fit_content = true
 
-[node name="ArcherRPS" type="Label" parent="TrainingPanel/VBox/UnitsContainer/ArcherRow/ArcherInfo"]
+[node name="ArcherRPS" type="RichTextLabel" parent="TrainingPanel/VBox/UnitsContainer/ArcherRow/ArcherInfo"]
 layout_mode = 2
-text = "Strong vs: 🗡  |  Weak vs: 🐎"
+bbcode_enabled = true
+text = "Strong vs: [img=14]res://assets/icons/dagger.svg[/img]  |  Weak vs: [img=14]res://assets/icons/horse.svg[/img]"
+fit_content = true
 
 [node name="ArcherDesc" type="Label" parent="TrainingPanel/VBox/UnitsContainer/ArcherRow/ArcherInfo"]
 layout_mode = 2
@@ -528,9 +568,11 @@ size_flags_horizontal = 3
 layout_mode = 2
 text = "COMBAT"
 
-[node name="CombatReport" type="Label" parent="TurnReportPanel/VBox/ScrollContainer/ReportContent"]
+[node name="CombatReport" type="RichTextLabel" parent="TurnReportPanel/VBox/ScrollContainer/ReportContent"]
 layout_mode = 2
+bbcode_enabled = true
 text = "No combat this turn."
+fit_content = true
 
 [node name="Separator2" type="HSeparator" parent="TurnReportPanel/VBox/ScrollContainer/ReportContent"]
 layout_mode = 2
@@ -539,9 +581,11 @@ layout_mode = 2
 layout_mode = 2
 text = "INCOME"
 
-[node name="IncomeReport" type="Label" parent="TurnReportPanel/VBox/ScrollContainer/ReportContent"]
+[node name="IncomeReport" type="RichTextLabel" parent="TurnReportPanel/VBox/ScrollContainer/ReportContent"]
 layout_mode = 2
+bbcode_enabled = true
 text = "Resources gained this turn."
+fit_content = true
 
 [node name="Separator3" type="HSeparator" parent="TurnReportPanel/VBox"]
 layout_mode = 2

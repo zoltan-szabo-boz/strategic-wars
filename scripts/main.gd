@@ -10,13 +10,13 @@ var tile_buttons: Array = []  # 2D array of Button references
 
 # Info panel
 var turn_label: Label
-var tiles_label: Label
-var manpower_label: Label
-var goods_label: Label
-var supplies_label: Label
-var pikemen_label: Label
-var cavalry_label: Label
-var archers_label: Label
+var tiles_label: RichTextLabel
+var manpower_label: RichTextLabel
+var goods_label: RichTextLabel
+var supplies_label: RichTextLabel
+var pikemen_label: RichTextLabel
+var cavalry_label: RichTextLabel
+var archers_label: RichTextLabel
 
 # Tile info
 var tile_info_panel: PanelContainer
@@ -27,9 +27,9 @@ var train_units_btn: Button
 
 # Training panel
 var training_panel: PanelContainer
-var manpower_draft_label: Label
-var goods_draft_label: Label
-var supplies_draft_label: Label
+var manpower_draft_label: RichTextLabel
+var goods_draft_label: RichTextLabel
+var supplies_draft_label: RichTextLabel
 var pike_count_label: Label
 var pike_plus_btn: Button
 var pike_minus_btn: Button
@@ -47,8 +47,8 @@ var draft_units: Dictionary = {"pikemen": 0, "cavalry": 0, "archers": 0}
 
 # Turn report panel
 var turn_report_panel: PanelContainer
-var combat_report_label: Label
-var income_report_label: Label
+var combat_report_label: RichTextLabel
+var income_report_label: RichTextLabel
 var close_report_btn: Button
 
 # Turn report data
@@ -90,12 +90,28 @@ const TILE_COLORS := {
 	"ai": Color(0.85, 0.29, 0.29),           # Red
 }
 
+# Text icons for tiles (buttons don't support BBCode)
 const RESOURCE_ICONS := {
-	Config.ResourceType.MANPOWER: "⛏",
-	Config.ResourceType.GOODS: "⚙",
-	Config.ResourceType.SUPPLIES: "🍞",
-	Config.ResourceType.ALL: "⭐",
+	Config.ResourceType.MANPOWER: "M",
+	Config.ResourceType.GOODS: "G",
+	Config.ResourceType.SUPPLIES: "S",
+	Config.ResourceType.ALL: "*",
 }
+
+# Icon BBCode helpers
+const ICON_PICKAXE := "[img=14]res://assets/icons/pickaxe.svg[/img]"
+const ICON_GEAR := "[img=14]res://assets/icons/gear.svg[/img]"
+const ICON_BREAD := "[img=14]res://assets/icons/bread.svg[/img]"
+const ICON_DAGGER := "[img=14]res://assets/icons/dagger.svg[/img]"
+const ICON_HORSE := "[img=14]res://assets/icons/horse.svg[/img]"
+const ICON_BOW := "[img=14]res://assets/icons/bow.svg[/img]"
+const ICON_BLUE := "[img=14]res://assets/icons/blue_circle.svg[/img]"
+const ICON_RED := "[img=14]res://assets/icons/red_circle.svg[/img]"
+
+# Helper to set BBCode text on RichTextLabel
+func _set_bbcode(label: RichTextLabel, bbcode: String) -> void:
+	label.clear()
+	label.append_text(bbcode)
 
 # =============================================================================
 # INITIALIZATION
@@ -315,11 +331,11 @@ func _update_tile_button(x: int, y: int) -> void:
 		else:
 			btn.text = "%s%d" % [icon, tile.production]
 	else:
-		btn.text = "%s%d\n🛡%d" % [icon, tile.production, tile.defense]
+		btn.text = "%s%d\nD%d" % [icon, tile.production, tile.defense]
 
 	# Show assignment indicator if units assigned
 	if GameState.has_assignment(Vector2i(x, y)):
-		btn.text += "\n⚔"
+		btn.text += "\n!"
 
 # =============================================================================
 # UI REFRESH
@@ -335,9 +351,9 @@ func _refresh_all() -> void:
 
 func _refresh_resources() -> void:
 	var income := _calculate_income()
-	manpower_label.text = "⛏ Manpower: %d (+%d)" % [GameState.get_resource("manpower"), income["manpower"]]
-	goods_label.text = "⚙ Goods: %d (+%d)" % [GameState.get_resource("goods"), income["goods"]]
-	supplies_label.text = "🍞 Supplies: %d (+%d)" % [GameState.get_resource("supplies"), income["supplies"]]
+	_set_bbcode(manpower_label, "%s Manpower: %d (+%d)" % [ICON_PICKAXE, GameState.get_resource("manpower"), income["manpower"]])
+	_set_bbcode(goods_label, "%s Goods: %d (+%d)" % [ICON_GEAR, GameState.get_resource("goods"), income["goods"]])
+	_set_bbcode(supplies_label, "%s Supplies: %d (+%d)" % [ICON_BREAD, GameState.get_resource("supplies"), income["supplies"]])
 
 func _calculate_income() -> Dictionary:
 	var income := {"manpower": 0, "goods": 0, "supplies": 0}
@@ -360,13 +376,13 @@ func _calculate_income() -> Dictionary:
 
 func _refresh_army() -> void:
 	var available := GameState.get_available_army()
-	pikemen_label.text = "🗡 Pikemen: %d (%d)" % [available["pikemen"], GameState.army["pikemen"]]
-	cavalry_label.text = "🐎 Cavalry: %d (%d)" % [available["cavalry"], GameState.army["cavalry"]]
-	archers_label.text = "🏹 Archers: %d (%d)" % [available["archers"], GameState.army["archers"]]
+	_set_bbcode(pikemen_label, "%s Pikemen: %d (%d)" % [ICON_DAGGER, available["pikemen"], GameState.army["pikemen"]])
+	_set_bbcode(cavalry_label, "%s Cavalry: %d (%d)" % [ICON_HORSE, available["cavalry"], GameState.army["cavalry"]])
+	_set_bbcode(archers_label, "%s Archers: %d (%d)" % [ICON_BOW, available["archers"], GameState.army["archers"]])
 
 func _refresh_turn_info() -> void:
 	turn_label.text = "Turn: %d" % GameState.turn_number
-	tiles_label.text = "Tiles: 🔵%d vs 🔴%d" % [GameState.tiles_owned, GameState.ai_tiles_owned]
+	_set_bbcode(tiles_label, "Tiles: %s%d vs %s%d" % [ICON_BLUE, GameState.tiles_owned, ICON_RED, GameState.ai_tiles_owned])
 
 func _refresh_tile_info() -> void:
 	var coord := GameState.selected_tile
@@ -495,11 +511,11 @@ func _refresh_training_panel() -> void:
 	var remaining_supplies: int = current_supplies - int(draft_cost["supplies"])
 
 	if manpower_draft_label:
-		manpower_draft_label.text = "⛏ %d" % remaining_manpower
+		_set_bbcode(manpower_draft_label, "%s %d" % [ICON_PICKAXE, remaining_manpower])
 	if goods_draft_label:
-		goods_draft_label.text = "⚙ %d" % remaining_goods
+		_set_bbcode(goods_draft_label, "%s %d" % [ICON_GEAR, remaining_goods])
 	if supplies_draft_label:
-		supplies_draft_label.text = "🍞 %d" % remaining_supplies
+		_set_bbcode(supplies_draft_label, "%s %d" % [ICON_BREAD, remaining_supplies])
 
 	# Update unit counts
 	if pike_count_label:
@@ -658,28 +674,28 @@ func _show_turn_report() -> void:
 				combat_text += "  Casualties: "
 				var parts: Array = []
 				if casualties["pikemen"] > 0:
-					parts.append("🗡%d" % casualties["pikemen"])
+					parts.append("%s%d" % [ICON_DAGGER, casualties["pikemen"]])
 				if casualties["cavalry"] > 0:
-					parts.append("🐎%d" % casualties["cavalry"])
+					parts.append("%s%d" % [ICON_HORSE, casualties["cavalry"]])
 				if casualties["archers"] > 0:
-					parts.append("🏹%d" % casualties["archers"])
+					parts.append("%s%d" % [ICON_BOW, casualties["archers"]])
 				combat_text += ", ".join(parts) + "\n"
 			else:
 				combat_text += "  Casualties: None\n"
 			combat_text += "\n"
 
 	# Format income report
-	var income_text := "⛏ Manpower: +%d\n⚙ Goods: +%d\n🍞 Supplies: +%d" % [
-		turn_income["manpower"],
-		turn_income["goods"],
-		turn_income["supplies"]
+	var income_text := "%s Manpower: +%d\n%s Goods: +%d\n%s Supplies: +%d" % [
+		ICON_PICKAXE, turn_income["manpower"],
+		ICON_GEAR, turn_income["goods"],
+		ICON_BREAD, turn_income["supplies"]
 	]
 
 	# Update labels
 	if combat_report_label:
-		combat_report_label.text = combat_text.strip_edges()
+		_set_bbcode(combat_report_label, combat_text.strip_edges())
 	if income_report_label:
-		income_report_label.text = income_text
+		_set_bbcode(income_report_label, income_text)
 
 	# Show panel
 	if turn_report_panel:
