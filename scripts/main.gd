@@ -90,13 +90,20 @@ const TILE_COLORS := {
 	"ai": Color(0.85, 0.29, 0.29),           # Red
 }
 
-# Text icons for tiles (buttons don't support BBCode)
-const RESOURCE_ICONS := {
-	Config.ResourceType.MANPOWER: "M",
-	Config.ResourceType.GOODS: "G",
-	Config.ResourceType.SUPPLIES: "S",
-	Config.ResourceType.ALL: "*",
-}
+# Preloaded icon textures for tiles
+var RESOURCE_ICON_TEXTURES := {}
+var ICON_SHIELD: Texture2D
+var ICON_SWORDS: Texture2D
+
+func _load_icon_textures() -> void:
+	RESOURCE_ICON_TEXTURES = {
+		Config.ResourceType.MANPOWER: load("res://assets/icons/pickaxe.svg"),
+		Config.ResourceType.GOODS: load("res://assets/icons/gear.svg"),
+		Config.ResourceType.SUPPLIES: load("res://assets/icons/bread.svg"),
+		Config.ResourceType.ALL: null,  # Capital uses no icon, just "*"
+	}
+	ICON_SHIELD = load("res://assets/icons/shield.svg")
+	ICON_SWORDS = load("res://assets/icons/swords.svg")
 
 # Icon BBCode helpers
 const ICON_PICKAXE := "[img=14]res://assets/icons/pickaxe.svg[/img]"
@@ -118,6 +125,7 @@ func _set_bbcode(label: RichTextLabel, bbcode: String) -> void:
 # =============================================================================
 
 func _ready() -> void:
+	_load_icon_textures()
 	_get_node_references()
 	_connect_signals()
 	_start_new_game()
@@ -262,13 +270,75 @@ func _create_map_buttons() -> void:
 		child.queue_free()
 	tile_buttons.clear()
 
-	# Create grid of buttons
+	# Create grid of buttons with icon containers
 	for y in range(Config.GRID_SIZE):
 		var row: Array = []
 		for x in range(Config.GRID_SIZE):
 			var btn := Button.new()
 			btn.custom_minimum_size = Vector2(TILE_SIZE, TILE_SIZE)
 			btn.pressed.connect(_on_tile_clicked.bind(x, y))
+			btn.clip_text = true
+
+			# Create VBox container for icons/labels
+			var vbox := VBoxContainer.new()
+			vbox.name = "VBox"
+			vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
+			vbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+			btn.add_child(vbox)
+
+			# Resource row (icon + production)
+			var res_row := HBoxContainer.new()
+			res_row.name = "ResRow"
+			res_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			res_row.alignment = BoxContainer.ALIGNMENT_CENTER
+			vbox.add_child(res_row)
+
+			var res_icon := TextureRect.new()
+			res_icon.name = "ResIcon"
+			res_icon.custom_minimum_size = Vector2(16, 16)
+			res_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			res_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			res_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			res_row.add_child(res_icon)
+
+			var prod_label := Label.new()
+			prod_label.name = "ProdLabel"
+			prod_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			res_row.add_child(prod_label)
+
+			# Defense row (icon + value) - for neutral tiles
+			var def_row := HBoxContainer.new()
+			def_row.name = "DefRow"
+			def_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			def_row.alignment = BoxContainer.ALIGNMENT_CENTER
+			def_row.visible = false
+			vbox.add_child(def_row)
+
+			var def_icon := TextureRect.new()
+			def_icon.name = "DefIcon"
+			def_icon.custom_minimum_size = Vector2(12, 12)
+			def_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			def_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			def_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			def_row.add_child(def_icon)
+
+			var def_label := Label.new()
+			def_label.name = "DefLabel"
+			def_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			def_row.add_child(def_label)
+
+			# Assignment indicator (swords icon)
+			var assign_icon := TextureRect.new()
+			assign_icon.name = "AssignIcon"
+			assign_icon.custom_minimum_size = Vector2(14, 14)
+			assign_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			assign_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			assign_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			assign_icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+			assign_icon.visible = false
+			vbox.add_child(assign_icon)
+
 			map_container.add_child(btn)
 			row.append(btn)
 		tile_buttons.append(row)
@@ -318,24 +388,46 @@ func _update_tile_button(x: int, y: int) -> void:
 	pressed_style.bg_color = color.darkened(0.1)
 	btn.add_theme_stylebox_override("pressed", pressed_style)
 
-	# Set text: resource icon + production (or defense for neutrals/AI)
-	var icon: String = RESOURCE_ICONS.get(tile.resource_type, "?")
-	if tile.owner == Config.TileOwner.PLAYER:
-		if tile.resource_type == Config.ResourceType.ALL:
-			btn.text = icon  # Just star for capital
-		else:
-			btn.text = "%s%d" % [icon, tile.production]
-	elif tile.owner == Config.TileOwner.AI:
-		if tile.resource_type == Config.ResourceType.ALL:
-			btn.text = icon  # Just star for AI capital
-		else:
-			btn.text = "%s%d" % [icon, tile.production]
+	# Clear button text (we use custom children now)
+	btn.text = ""
+
+	# Get child nodes
+	var vbox := btn.get_node("VBox")
+	var res_icon: TextureRect = vbox.get_node("ResRow/ResIcon")
+	var prod_label: Label = vbox.get_node("ResRow/ProdLabel")
+	var def_row: HBoxContainer = vbox.get_node("DefRow")
+	var def_icon: TextureRect = vbox.get_node("DefRow/DefIcon")
+	var def_label: Label = vbox.get_node("DefRow/DefLabel")
+	var assign_icon: TextureRect = vbox.get_node("AssignIcon")
+
+	# Set resource icon and production
+	var icon_texture: Texture2D = RESOURCE_ICON_TEXTURES.get(tile.resource_type)
+	if icon_texture:
+		res_icon.texture = icon_texture
+		res_icon.visible = true
 	else:
-		btn.text = "%s%d\nD%d" % [icon, tile.production, tile.defense]
+		res_icon.visible = false
+
+	# Set production label
+	if tile.resource_type == Config.ResourceType.ALL:
+		prod_label.text = "*"  # Capital
+	else:
+		prod_label.text = str(tile.production)
+
+	# Show defense row for neutral/border tiles
+	if tile.owner == Config.TileOwner.NEUTRAL:
+		def_row.visible = true
+		def_icon.texture = ICON_SHIELD
+		def_label.text = str(tile.defense)
+	else:
+		def_row.visible = false
 
 	# Show assignment indicator if units assigned
 	if GameState.has_assignment(Vector2i(x, y)):
-		btn.text += "\n!"
+		assign_icon.texture = ICON_SWORDS
+		assign_icon.visible = true
+	else:
+		assign_icon.visible = false
 
 # =============================================================================
 # UI REFRESH
