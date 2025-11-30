@@ -42,19 +42,9 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="LeftPanel" type="VBoxContainer" parent="GameContainer"]
-custom_minimum_size = Vector2(200, 0)
+[node name="LeftSpacer" type="Control" parent="GameContainer"]
+custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
-size_flags_horizontal = 0
-
-[node name="TrainUnitsBtn" type="Button" parent="GameContainer/LeftPanel"]
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
-text = "TRAIN UNITS"
-
-[node name="Spacer" type="Control" parent="GameContainer/LeftPanel"]
-layout_mode = 2
-size_flags_vertical = 3
 
 [node name="MapPanel" type="PanelContainer" parent="GameContainer"]
 layout_mode = 2
@@ -141,9 +131,18 @@ size_flags_horizontal = 4
 text = "Click a tile to select"
 vertical_alignment = 1
 
-[node name="TurnLabel" type="Label" parent="GameContainer/RightPanel"]
-layout_mode = 2
+[node name="TurnLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -50.0
+offset_top = 8.0
+offset_right = 50.0
+offset_bottom = 32.0
+grow_horizontal = 2
 text = "Turn: 1"
+horizontal_alignment = 1
 
 [node name="VictoryPanel" type="PanelContainer" parent="."]
 layout_mode = 1
@@ -165,43 +164,51 @@ text = "VICTORY!"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="NewGameBtn" type="Button" parent="."]
+[node name="TopLeftButtons" type="HBoxContainer" parent="."]
 layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
+anchors_preset = 0
 offset_left = 8.0
-offset_top = -42.0
-offset_right = 101.0
-offset_bottom = -11.0
-grow_vertical = 0
+offset_top = 8.0
+offset_right = 160.0
+offset_bottom = 48.0
+
+[node name="NewGameBtn" type="Button" parent="TopLeftButtons"]
+custom_minimum_size = Vector2(100, 35)
+layout_mode = 2
 text = "New Game"
 
-[node name="HelpBtn" type="Button" parent="."]
-layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_left = 109.0
-offset_top = -42.0
-offset_right = 144.0
-offset_bottom = -11.0
-grow_vertical = 0
+[node name="HelpBtn" type="Button" parent="TopLeftButtons"]
+custom_minimum_size = Vector2(40, 35)
+layout_mode = 2
 text = "?"
 
-[node name="EndTurnBtn" type="Button" parent="."]
+[node name="BottomButtons" type="HBoxContainer" parent="."]
 layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
+anchors_preset = 7
+anchor_left = 0.5
 anchor_top = 1.0
-anchor_right = 1.0
+anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -108.0
-offset_top = -58.0
-offset_right = -8.0
+offset_left = -120.0
+offset_top = -50.0
+offset_right = 120.0
 offset_bottom = -8.0
-grow_horizontal = 0
+grow_horizontal = 2
 grow_vertical = 0
+alignment = 1
+
+[node name="TrainUnitsBtn" type="Button" parent="BottomButtons"]
+custom_minimum_size = Vector2(110, 40)
+layout_mode = 2
+text = "TRAIN UNITS"
+
+[node name="Spacer" type="Control" parent="BottomButtons"]
+custom_minimum_size = Vector2(20, 0)
+layout_mode = 2
+
+[node name="EndTurnBtn" type="Button" parent="BottomButtons"]
+custom_minimum_size = Vector2(100, 40)
+layout_mode = 2
 text = "END TURN"
 
 [node name="HelpPanel" type="PanelContainer" parent="."]

@@ -187,7 +187,7 @@ func _get_node_references() -> void:
 		push_error("MapContainer not found!")
 		return
 
-	turn_label = get_node_or_null("GameContainer/RightPanel/TurnLabel")
+	turn_label = get_node_or_null("TurnLabel")
 	tiles_label = get_node_or_null("GameContainer/RightPanel/TilesLabel")
 	manpower_label = get_node_or_null("GameContainer/RightPanel/ManpowerLabel")
 	goods_label = get_node_or_null("GameContainer/RightPanel/GoodsLabel")
@@ -199,7 +199,7 @@ func _get_node_references() -> void:
 	tile_info_panel = get_node_or_null("GameContainer/RightPanel/TileInfoPanel")
 	tile_info_label = get_node_or_null("GameContainer/RightPanel/TileInfoPanel/TileInfoLabel")
 
-	train_units_btn = get_node_or_null("GameContainer/LeftPanel/TrainUnitsBtn")
+	train_units_btn = get_node_or_null("BottomButtons/TrainUnitsBtn")
 
 	# Training panel
 	training_panel = get_node_or_null("TrainingPanel")
@@ -232,15 +232,15 @@ func _get_node_references() -> void:
 	archer_slider = get_node_or_null("AssignPanel/VBox/ArcherRow/ArcherSlider")
 	archer_label = get_node_or_null("AssignPanel/VBox/ArcherRow/ArcherLabel")
 
-	end_turn_btn = get_node_or_null("EndTurnBtn")
+	end_turn_btn = get_node_or_null("BottomButtons/EndTurnBtn")
 
 	victory_panel = get_node_or_null("VictoryPanel")
 	victory_label = get_node_or_null("VictoryPanel/VictoryLabel")
 
-	help_btn = get_node_or_null("HelpBtn")
+	help_btn = get_node_or_null("TopLeftButtons/HelpBtn")
 	help_panel = get_node_or_null("HelpPanel")
 	close_help_btn = get_node_or_null("HelpPanel/VBox/CloseHelpBtn")
-	new_game_btn = get_node_or_null("NewGameBtn")
+	new_game_btn = get_node_or_null("TopLeftButtons/NewGameBtn")
 
 func _connect_signals() -> void:
 	if not map_container:
@@ -300,7 +300,7 @@ func _start_new_game() -> void:
 	if victory_panel:
 		victory_panel.hide()
 	if help_panel:
-		help_panel.hide()
+		help_panel.show()
 	if training_panel:
 		training_panel.hide()
 	if turn_report_panel:
